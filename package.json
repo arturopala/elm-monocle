@@ -1,0 +1,33 @@
+{
+  "name": "elm-monocle",
+  "version": "1.0.0",
+  "description": "Monocle library providing purely functional abstractions to manipulate records",
+  "scripts": {
+    "compile": "onchange '**/*.elm' -v -- elm-make **/*.elm --output monocle.js",
+    "test": "onchange '**/*.elm' -v -- elm-test test/TestRunner.elm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arturopala/elm-monocle.git"
+  },
+  "keywords": [
+    "monocle",
+    "lens",
+    "iso",
+    "prism",
+    "optional",
+    "record"
+  ],
+  "author": "Artur Opala",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/arturopala/elm-monocle/issues"
+  },
+  "homepage": "https://github.com/arturopala/elm-monocle#readme",
+  "devDependencies": {
+    "elm": "^0.16.0",
+    "elm-test": "^0.16.0",
+    "onchange": "^2.0.0",
+    "ws": "^1.0.1"
+  }
+}
