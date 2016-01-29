@@ -1,7 +1,7 @@
 {
   "name": "elm-monocle",
   "version": "1.0.0",
-  "description": "Monocle library providing purely functional abstractions to manipulate records",
+  "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "onchange '**/*.elm' -v -- elm-make **/*.elm --output monocle.js",
     "test": "onchange '**/*.elm' -v -- elm-test test/TestRunner.elm"

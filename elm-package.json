@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "summary": "Monocle library providing purely functional abstractions to manipulate records",
+    "summary": "Library providing purely functional abstractions to manipulate records",
     "repository": "https://github.com/arturopala/elm-monocle.git",
     "license": "BSD3",
     "source-directories": [

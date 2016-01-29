@@ -33,6 +33,9 @@ type alias Prism a b =
 
 
 {-| Checks if value of type `A` has matching element of type 'B'
+
+        Monocle.Prism.isMatching string2IntPrism "abc" == False
+        Monocle.Prism.isMatching string2IntPrism "123" == True
 -}
 isMatching : Prism a b -> a -> Bool
 isMatching prism a =
@@ -45,6 +48,11 @@ isMatching prism a =
 
 
 {-| Modifies given function `(b -> b)` to `(a -> Maybe a)` using `Prism a b`
+
+        fx i = i * 2
+        modified = Monocle.Prism.modify string2IntPrism fx
+        modified "22" == Just "44"
+        modified "abc" == Nothing
 -}
 modifyOption : Prism a b -> (b -> b) -> a -> Maybe a
 modifyOption prism f =
@@ -52,6 +60,11 @@ modifyOption prism f =
 
 
 {-| Modifies given function `(b -> b)` to `(a -> a)` using `Prism a b`
+
+        fx i = i * 2
+        modified = Monocle.Prism.modify string2IntPrism fx
+        modified "22" == "44"
+        modified "abc" == "abc"
 -}
 modify : Prism a b -> (b -> b) -> a -> a
 modify prism f =
@@ -62,6 +75,13 @@ modify prism f =
 
 
 {-| Composes `Prism a b` with `Prism b c` and returns `Prism a c`
+
+        prism = Monocle.Prism.compose string2FloatPrism float2IntPrism
+        prism.getOption "22" == Just 22
+        prism.getOption "22.2" == Nothing
+        prism.getOption "22a" == Nothing
+        prism.getOption "abc" == Nothing
+
 -}
 compose : Prism a b -> Prism b c -> Prism a c
 compose outer inner =
@@ -78,6 +98,13 @@ compose outer inner =
 
 
 {-| Composes `Prism a b` with `Iso b c` and returns `Prism a c`
+
+        iso = Iso ((*) 10) ((//) 10)
+        prism = Monocle.Prism.composeIso string2IntPrism iso
+        prism.getOption "22" == Just 220
+        prism.getOption "22.2" == Nothing
+        prism.getOption "22a" == Nothing
+        prism.getOption "abc" == Nothing
 -}
 composeIso : Prism a b -> Iso b c -> Prism a c
 composeIso outer inner =

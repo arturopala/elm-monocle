@@ -6,16 +6,13 @@ import Check.Test exposing (test, assert)
 import Check.Investigator exposing (Investigator, tuple, string, list, char, int)
 import Random exposing (initialSeed)
 import Random.Int
-import Random.Extra exposing (constant)
+import Random.Extra exposing (constant, merge)
 import Shrink
 import String
 import Char
 import Maybe
 import Result
-
-
---import Monocle.Iso exposing (Iso)
-
+import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
 
 
@@ -27,7 +24,9 @@ all =
         , test_prism_property_no_round_trip_when_not_matching
         , test_prism_property_round_trip_other_way
         , test_prism_method_modify
+        , test_prism_method_modify_option
         , test_prism_method_compose
+        , test_prism_method_composeIso
         ]
 
 
@@ -41,8 +40,14 @@ seed =
     initialSeed 21882981
 
 
-digits =
+numbers : Investigator String
+numbers =
     Check.Investigator.investigator (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
+
+
+numbersAndStrings : Investigator String
+numbersAndStrings =
+    Check.Investigator.investigator (merge numbers.generator string.generator) string.shrinker
 
 
 string2IntPrism : Prism String Int
@@ -80,7 +85,7 @@ test_prism_property_partial_round_trip_one_way =
 
         expected x = Just x
 
-        investigator = digits
+        investigator = numbers
     in
         test "For some a: A, getOption a |> Maybe.map reverseGet == Just a" actual expected investigator count seed
 
@@ -123,11 +128,30 @@ test_prism_method_modify =
             in
                 modified x
 
-        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString) |> Maybe.withDefault ""
+        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString) |> Maybe.withDefault x
 
-        investigator = digits
+        investigator = numbersAndStrings
     in
         test "Prism.modify" actual expected investigator count seed
+
+
+test_prism_method_modify_option =
+    let
+        prism = string2IntPrism
+
+        actual x =
+            let
+                fx i = i * 2
+
+                modified = Monocle.Prism.modifyOption prism fx
+            in
+                modified x
+
+        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString)
+
+        investigator = numbersAndStrings
+    in
+        test "Prism.modifyOption" actual expected investigator count seed
 
 
 test_prism_method_compose =
@@ -138,6 +162,21 @@ test_prism_method_compose =
 
         expected x = x |> String.toInt >> Result.toMaybe
 
-        investigator = string
+        investigator = numbersAndStrings
     in
-        test "Iso.compose" actual expected investigator count seed
+        test "Prism.compose" actual expected investigator count seed
+
+
+test_prism_method_composeIso =
+    let
+        iso = Iso ((*) 10) ((//) 10)
+
+        prism = Monocle.Prism.composeIso string2IntPrism iso
+
+        actual x = prism.getOption x
+
+        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
+
+        investigator = numbersAndStrings
+    in
+        test "Prism.composeIso" actual expected investigator count seed

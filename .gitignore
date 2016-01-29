@@ -3,3 +3,9 @@
 
 # added by GitSavvy
 node_modules
+
+# added by GitSavvy
+/documentation.json
+
+# added by GitSavvy
+/monocle.js
