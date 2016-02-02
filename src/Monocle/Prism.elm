@@ -1,4 +1,4 @@
-module Monocle.Prism (Prism, isMatching, modify, modifyOption, compose, composeIso) where
+module Monocle.Prism (Prism, isMatching, modify, modifyOption, compose, composeIso, toPrism) where
 
 {-| A Prism is a tool which optionally converts elements of type A into elements of type B and back.
 
@@ -17,6 +17,9 @@ module Monocle.Prism (Prism, isMatching, modify, modifyOption, compose, composeI
 
 # Derived methods
 @docs isMatching, modify, modifyOption, compose, composeIso
+
+# Conversion
+@docs toPrism
 
 -}
 
@@ -118,3 +121,10 @@ composeIso outer inner =
                     Nothing
     in
         Prism (getOption) (inner.reverseGet >> outer.reverseGet)
+
+
+{-| Casts `Iso a b` to `Prism a b`
+-}
+toPrism : Iso a b -> Prism a b
+toPrism iso =
+    Prism (iso.get >> Just) iso.reverseGet

@@ -27,6 +27,8 @@ all =
         , test_prism_method_modify_option
         , test_prism_method_compose
         , test_prism_method_composeIso
+        , test_prism_method_toPrism
+        , test_prism_method_toPrism_reverseGet
         ]
 
 
@@ -180,3 +182,33 @@ test_prism_method_composeIso =
         investigator = numbersAndStrings
     in
         test "Prism.composeIso" actual expected investigator count seed
+
+
+test_prism_method_toPrism =
+    let
+        iso = Iso String.toList String.fromList
+
+        prism = Monocle.Prism.toPrism iso
+
+        actual x = prism.getOption x
+
+        expected x = iso.get x |> Just
+
+        investigator = string
+    in
+        test "Prism.toPrism" actual expected investigator count seed
+
+
+test_prism_method_toPrism_reverseGet =
+    let
+        iso = Iso String.fromList String.toList
+
+        prism = Monocle.Prism.toPrism iso
+
+        actual x = prism.reverseGet x
+
+        expected x = iso.reverseGet x
+
+        investigator = string
+    in
+        test "Prism.toPrism.reverseGet" actual expected investigator count seed
