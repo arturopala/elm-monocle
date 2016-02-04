@@ -18,7 +18,7 @@ An Iso is a tool which converts elements of type A into elements of type B and b
         }
 ```
 
-#### Example
+###### Example
 
 ```elm
     string2CharListIso : Iso String (List Char)
@@ -40,7 +40,7 @@ A Prism is a tool which optionally converts elements of type A into elements of 
         }
 ```
 
-#### Example
+###### Example
 
 ```elm
     string2IntPrism : Prism String Int
@@ -63,7 +63,7 @@ A Lens is a functional concept which solves a very common problem: how to update
         }
 ```
 
-#### Example
+###### Example
 
 ```elm
     addressStreetNameLens : Lens Address String
