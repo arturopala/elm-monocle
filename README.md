@@ -66,6 +66,16 @@ A Lens is a functional concept which solves a very common problem: how to update
 ###### Example
 
 ```elm
+
+    type alias Address = 
+        {streetName: String
+        ,postcode: String
+        ,town: String}
+
+    type alias Place =
+        {name: String
+        ,address: Address}
+
     addressStreetNameLens : Lens Address String
     addressStreetNameLens =
         let
@@ -74,4 +84,25 @@ A Lens is a functional concept which solves a very common problem: how to update
             set sn a = { a | streetName = sn }
         in
             Lens get set
+
+    placeAddressLens : Lens Place Address
+    placeAddressLens =
+        let
+            get p = p.address
+
+            set a p = { p | address = a }
+        in
+            Lens get set
+
+    placeStreetName: Lens Place String
+    placeStreetName = placeAddressLens `compose` addressStreetNameLens
+
+    myPlace = Place "my" (Address "Elm" "00001" "Daisytown")
+    placeStreetName.get myPlace == "Elm"
+    
+    myNewPlace = placeStreetName.set "Oak" myPlace
+
+    placeStreetName.get myNewPlace == "Oak"
+    myNewPlace == Place "my" (Address "Oak" "00001" "Daisytown")
+
 ```
