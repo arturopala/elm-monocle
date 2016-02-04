@@ -12,4 +12,5 @@ all =
         "A Monocle test suite"
         [ IsoSpec.all
         , PrismSpec.all
+        , LensSpec.all
         ]

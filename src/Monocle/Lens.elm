@@ -6,6 +6,16 @@ module Monocle.Lens (Lens, fromIso) where
 # Definition
 @docs Lens
 
+# Example
+    addressStreetNameLens : Lens Address String
+    addressStreetNameLens =
+        let
+            get a = a.streetName
+
+            set sn a = { a | streetName = sn }
+        in
+            Lens get set
+
 # Conversion
 @docs fromIso
 
