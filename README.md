@@ -18,6 +18,17 @@ An Iso is a tool which converts elements of type A into elements of type B and b
         }
 ```
 
+#### Example
+
+```elm
+    string2CharListIso : Iso String (List Char)
+    string2CharListIso =
+        Iso String.toList String.fromList
+
+    (string2CharListIso.get "ABcdE") == ['A','B','c','d','E']
+    (string2CharListIso.reverseGet ['A','B','c','d','E']) == "ABcdE"
+```
+
 ## Prism
 
 A Prism is a tool which optionally converts elements of type A into elements of type B and back.
@@ -29,6 +40,18 @@ A Prism is a tool which optionally converts elements of type A into elements of 
         }
 ```
 
+#### Example
+
+```elm
+    string2IntPrism : Prism String Int
+    string2IntPrism =
+        Prism (String.toInt >> Result.toMaybe) toString
+
+    string2IntPrism.getOption "17896" == Just 17896
+    string2IntPrism.getOption "1a896" == Nothing
+    string2IntPrism.reverseGet 1626767 = "1626767"
+```
+
 ## Lens
 
 A Lens is a functional concept which solves a very common problem: how to update a complex immutable structure. Lens acts as a zoom into record.
@@ -38,4 +61,17 @@ A Lens is a functional concept which solves a very common problem: how to update
         { get : a -> b
         , set : b -> a -> a
         }
+```
+
+#### Example
+
+```elm
+    addressStreetNameLens : Lens Address String
+    addressStreetNameLens =
+        let
+            get a = a.streetName
+
+            set sn a = { a | streetName = sn }
+        in
+            Lens get set
 ```
