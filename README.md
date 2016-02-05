@@ -54,7 +54,7 @@ A Prism is a tool which optionally converts elements of type A into elements of 
 
 ## Lens
 
-A Lens is a functional concept which solves a very common problem: how to update a complex immutable structure. Lens acts as a zoom into record.
+A Lens is a functional concept which solves a very common problem: how to easily update a complex immutable structure, for this purpose Lens acts as a zoom into a record. Basic Lens can be easily modified and composed. 
 
 ```elm
     type alias Lens a b =

@@ -50,7 +50,7 @@ isMatching prism a =
             False
 
 
-{-| Modifies given function `(b -> b)` to `(a -> Maybe a)` using `Prism a b`
+{-| Modifies given function `(b -> b)` to be `(a -> Maybe a)` using `Prism a b`
 
         fx i = i * 2
         modified = Monocle.Prism.modify string2IntPrism fx
@@ -62,7 +62,7 @@ modifyOption prism f =
     prism.getOption >> Maybe.map (f >> prism.reverseGet)
 
 
-{-| Modifies given function `(b -> b)` to `(a -> a)` using `Prism a b`
+{-| Modifies given function `(b -> b)` to be `(a -> a)` using `Prism a b`
 
         fx i = i * 2
         modified = Monocle.Prism.modify string2IntPrism fx

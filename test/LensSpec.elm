@@ -15,7 +15,7 @@ import Char
 import Result
 import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
-import Monocle.Lens exposing (Lens, compose)
+import Monocle.Lens exposing (Lens, compose, modify)
 import Maybe exposing (Maybe)
 
 
@@ -26,6 +26,7 @@ all =
         [ test_lens_property_identity
         , test_lens_property_identity_reverse
         , test_lens_method_compose
+        , test_lens_method_modify
         ]
 
 
@@ -165,3 +166,18 @@ test_lens_method_compose =
         investigator = Check.Investigator.tuple ( string, places )
     in
         test "Lens.compose" actual expected investigator count seed
+
+
+test_lens_method_modify =
+    let
+        f sn = String.reverse sn
+
+        lens = placeAddressLens `compose` addressStreetNameLens
+
+        actual p = p |> (modify lens f)
+
+        expected p = lens.set (String.reverse (lens.get p)) p
+
+        investigator = places
+    in
+        test "Lens.modify" actual expected investigator count seed

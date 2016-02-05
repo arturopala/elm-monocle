@@ -1,4 +1,4 @@
-module Monocle.Lens (Lens, fromIso, compose) where
+module Monocle.Lens (Lens, fromIso, compose, modify) where
 
 {-| A Lens is a functional concept which solves a very common problem:
     how to update a complex immutable structure. Lens acts as a zoom into record.
@@ -29,7 +29,7 @@ module Monocle.Lens (Lens, fromIso, compose) where
     placeStreetName = placeAddressLens `compose` addressStreetNameLens
 
 # Derived methods
-@docs compose
+@docs compose, modify
 
 # Conversion
 @docs fromIso
@@ -37,6 +37,7 @@ module Monocle.Lens (Lens, fromIso, compose) where
 -}
 
 import Monocle.Iso exposing (Iso)
+import Dict exposing (Dict)
 
 
 {-| In order to create Lens we need to suply 2 functions: set and get
@@ -55,6 +56,21 @@ compose outer inner =
         set c a = outer.get a |> inner.set c |> (\b -> outer.set b a)
     in
         Lens (outer.get >> inner.get) set
+
+
+{-| Modifies given function `(b -> b)` to be `(a -> a)` using `Lens a b`
+
+    addressStreetNameLens = Lens Address String
+    fx streetName = String.reverse streeName
+    fx2 = Lens.modify addressStreetNameLens fx
+    fx2 {streetName="abcdef"} == {streetName="fedcba"}
+-}
+modify : Lens a b -> (b -> b) -> a -> a
+modify lens f =
+    let
+        mf a = lens.get a |> f |> (\b -> lens.set b a)
+    in
+        mf
 
 
 {-| Casts `Iso a b` to `Lens a b`

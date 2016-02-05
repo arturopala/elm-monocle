@@ -42,7 +42,7 @@ reverse iso =
     Iso iso.reverseGet iso.get
 
 
-{-| Modifies given function `(b -> b)` to `(a -> a)` using `Iso a b`
+{-| Modifies given function `(b -> b)` to be `(a -> a)` using `Iso a b`
 
         someiso = Iso String.toList String.fromList
         somefx xs =  '@' :: xs
