@@ -4,6 +4,7 @@ import ElmTest exposing (suite, equals, Test)
 import IsoSpec
 import PrismSpec
 import LensSpec
+import OptionalSpec
 
 
 all : Test
@@ -13,4 +14,5 @@ all =
         [ IsoSpec.all
         , PrismSpec.all
         , LensSpec.all
+        , OptionalSpec.all
         ]

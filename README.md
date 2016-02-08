@@ -54,7 +54,7 @@ A Prism is a tool which optionally converts elements of type A into elements of 
 
 ## Lens
 
-A Lens is a functional concept which solves a very common problem: how to easily update a complex immutable structure, for this purpose Lens acts as a zoom into a record. Basic Lens can be easily modified and composed. 
+A Lens is a functional concept which solves a very common problem: how to easily update a complex immutable structure, for this purpose Lens acts as a zoom into a record. 
 
 ```elm
     type alias Lens a b =
@@ -105,4 +105,28 @@ A Lens is a functional concept which solves a very common problem: how to easily
     placeStreetName.get myNewPlace == "Oak"
     myNewPlace == Place "my" (Address "Oak" "00001" "Daisytown")
 
+```
+
+## Optional
+
+A Optional is a weaker Lens and a weaker Prism.
+
+```elm
+    type alias Optional a b =
+        { getOption : a -> Maybe b
+        , set : b -> a -> a
+        }
+```
+
+###### Example
+
+```elm
+    addressRegionOptional : Optional Address String
+    addressRegionOptional =
+        let
+            getOption a = a.region
+
+            set r a = { a | region = Just r }
+        in
+            Optional getOption set
 ```

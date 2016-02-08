@@ -1,7 +1,8 @@
 module Monocle.Lens (Lens, fromIso, compose, modify) where
 
 {-| A Lens is a functional concept which solves a very common problem:
-    how to update a complex immutable structure. Lens acts as a zoom into record.
+    how to easily update a complex immutable structure,
+    for this purpose Lens acts as a zoom into a record.
 
 # Definition
 @docs Lens
