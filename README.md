@@ -129,4 +129,28 @@ A Optional is a weaker Lens and a weaker Prism.
             set r a = { a | region = Just r }
         in
             Optional getOption set
+
+    string2IntPrism : Prism String Int
+    string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
+
+    addressRegionIntOptional: Optional Address Int
+    addressRegionIntOptional = addressRegionOptional `compose` (fromPrism string2IntPrism)
+
+    string2CharListIso : Iso String (List Char)
+    string2CharListIso = Iso String.toList String.fromList
+
+    addressRegionListCharOptional: Optional Address (List Char)
+    addressRegionListCharOptional = addressRegionOptional `composeLens` (fromIso string2CharListIso)
+
+    modifyRegion: String -> String
+    modifyRegion region = String.reverse region
+
+    modifyAddressRegion: Address -> Maybe Address
+    modifyAddressRegion address = Optional.modifyOption addressRegionOptional modifyRegion address
+
+    modifyRegion: String -> String
+    modifyRegion region = String.reverse region
+
+    modifyAddressRegion: Address -> Address
+    modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
 ```
