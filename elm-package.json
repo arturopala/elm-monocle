@@ -10,7 +10,8 @@
     "exposed-modules": [
         "Monocle.Iso",
         "Monocle.Prism",
-        "Monocle.Lens"
+        "Monocle.Lens",
+        "Monocle.Optional"
     ],
     "dependencies": {
         "elm-lang/core": "3.0.0 <= v < 4.0.0",
