@@ -5,6 +5,7 @@ import IsoSpec
 import PrismSpec
 import LensSpec
 import OptionalSpec
+import OptionalExample
 
 
 all : Test

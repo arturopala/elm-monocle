@@ -1,11 +1,12 @@
 {
     "version": "1.0.0",
-    "summary": "Library providing purely functional abstractions to manipulate records",
+    "summary": "Library providing functional tools to manipulate complex records",
     "repository": "https://github.com/arturopala/elm-monocle.git",
     "license": "BSD3",
     "source-directories": [
         "src",
-        "test"
+        "test",
+        "example"
     ],
     "exposed-modules": [
         "Monocle.Iso",
