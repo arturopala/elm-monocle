@@ -5,6 +5,9 @@ elm-monocle
 
 A [Monocle](http://julien-truffaut.github.io/Monocle/)-inspired library providing purely functional abstractions to manipulate complex records in the [elm](http://www.elm-lang.org/) language.
 
+Published as [**arturopala/elm-monocle**](http://package.elm-lang.org/packages/arturopala/elm-monocle/1.1.0) library.
+
+
 # Long Example
 
 ```elm
