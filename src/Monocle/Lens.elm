@@ -1,4 +1,4 @@
-module Monocle.Lens (Lens, fromIso, compose, modify) where
+module Monocle.Lens (Lens, fromIso, compose, modify, zip) where
 
 {-| A Lens is a functional concept which solves a very common problem:
     how to easily update a complex immutable structure,
@@ -30,7 +30,7 @@ module Monocle.Lens (Lens, fromIso, compose, modify) where
     placeStreetName = placeAddressLens `compose` addressStreetNameLens
 
 # Derived methods
-@docs compose, modify
+@docs compose, modify, zip
 
 # Conversion
 @docs fromIso
@@ -82,3 +82,15 @@ fromIso iso =
         set b _ = iso.reverseGet b
     in
         Lens iso.get set
+
+
+{-| Zips `Lens a c` with `Lens b d` to form Lens ( a, b ) ( c, d )
+-}
+zip : Lens a c -> Lens b d -> Lens ( a, b ) ( c, d )
+zip left right =
+    let
+        get ( a, b ) = ( left.get a, right.get b )
+
+        set ( c, d ) ( a, b ) = ( left.set c a, right.set d b )
+    in
+        Lens get set

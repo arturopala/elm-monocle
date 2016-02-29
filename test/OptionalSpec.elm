@@ -16,7 +16,7 @@ import Result
 import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
 import Monocle.Lens exposing (Lens, fromIso)
-import Monocle.Optional exposing (Optional, fromPrism, compose, composeLens, modifyOption, modify)
+import Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, zip)
 import Maybe exposing (Maybe)
 
 
@@ -34,6 +34,8 @@ all =
         , test_lens_method_modifyOption_just
         , test_lens_method_modify_just
         , test_lens_method_modifyOption_nothing
+        , test_optional_method_zip
+        , test_optional_method_fromLens
         ]
 
 
@@ -144,6 +146,16 @@ addressRegionOptional =
         set r a = { a | region = Just r }
     in
         Optional getOption set
+
+
+addressStreetNameLens : Lens Address String
+addressStreetNameLens =
+    let
+        get a = a.streetName
+
+        set sn a = { a | streetName = sn }
+    in
+        Lens get set
 
 
 placeAddressOptional : Optional Place Address
@@ -320,3 +332,33 @@ test_lens_method_modify_nothing =
         investigator = addressesWithoutRegion
     in
         test "Optional.modify for Nothing" actual expected investigator count seed
+
+
+test_optional_method_zip =
+    let
+        address1 = Address "test" Street Nothing "test" Nothing "test" US
+
+        address2 = Address "test" Street Nothing "test" (Just "test") "test" US
+
+        opt = addressRegionOptional `zip` addressRegionOptional
+
+        actual x = opt.getOption (opt.set x ( address1, address2 ))
+
+        expected x = Just x
+
+        investigator = Check.Investigator.tuple ( string, string )
+    in
+        test "Optional.zip" actual expected investigator count seed
+
+
+test_optional_method_fromLens =
+    let
+        opt = fromLens addressStreetNameLens
+
+        actual ( a, s ) = opt.set s a
+
+        expected ( a, s ) = { a | streetName = s }
+
+        investigator = Check.Investigator.tuple ( addressesWithRegion, string )
+    in
+        test "Optional.fromLens" actual expected investigator count seed

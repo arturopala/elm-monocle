@@ -1,10 +1,12 @@
 {
   "name": "elm-monocle",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
-    "compile": "onchange '**/*.elm' -v -- elm-make **/*.elm --output monocle.js",
-    "test": "onchange '**/*.elm' -v -- elm-test test/TestRunner.elm"
+    "compile": "elm-make **/*.elm --output monocle.js",
+    "compile-and-watch": "echo 'Compiling elm-monocle ...' && npm run compile && onchange '**/*.elm' -v -- npm run compile",
+    "test": "elm-test test/TestRunner.elm",
+    "test-and-watch": "onchange '**/*.elm' -v -- npm test"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-module Monocle.Optional (Optional, fromPrism, compose, composeLens, modifyOption, modify) where
+module Monocle.Optional (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, zip) where
 
 {-| A Optional is a weaker Lens and a weaker Prism
 
@@ -6,10 +6,10 @@ module Monocle.Optional (Optional, fromPrism, compose, composeLens, modifyOption
 @docs Optional
 
 # Derived methods
-@docs compose, composeLens, modifyOption, modify
+@docs compose, composeLens, modifyOption, modify, zip
 
 # Conversion
-@docs fromPrism
+@docs fromPrism, fromLens
 
 # Example
 
@@ -138,3 +138,35 @@ fromPrism prism =
         set b _ = prism.reverseGet b
     in
         Optional prism.getOption set
+
+
+{-| Casts `Lens a b` to `Optional a b` where `getOption` will return always `Just`
+-}
+fromLens : Lens a b -> Optional a b
+fromLens lens =
+    let
+        getOption a = Just (lens.get a)
+    in
+        Optional getOption lens.set
+
+
+{-| Zip `Optional a c` with `Optional b d` to form Optional for the pairs ( a, b ) ( c, d )
+-}
+zip : Optional a c -> Optional b d -> Optional ( a, b ) ( c, d )
+zip left right =
+    let
+        getOption ( a, b ) =
+            left.getOption a
+                |> (\ma ->
+                        Maybe.andThen
+                            ma
+                            (\c ->
+                                right.getOption b
+                                    |> Maybe.map (\d -> ( c, d ))
+                            )
+                   )
+
+        set ( c, d ) ( a, b ) =
+            ( left.set c a, right.set d b )
+    in
+        Optional getOption set

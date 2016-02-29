@@ -254,3 +254,27 @@ A Optional is a weaker Lens and a weaker Prism.
     modifyAddressRegion: Address -> Address
     modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
 ```
+
+
+# Build
+
+## Prerequisites
+
+-   Node.js
+-   run `npm install`
+
+## Compile
+
+Run
+
+`npm run compile`
+
+or 
+
+`npm run compile-and-watch`
+
+## Test
+
+Run
+
+`npm test`
