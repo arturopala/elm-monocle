@@ -15,7 +15,7 @@ import Char
 import Result
 import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
-import Monocle.Lens exposing (Lens, compose, modify, zip)
+import Monocle.Lens exposing (Lens, compose, modify, zip, modifyAndMerge)
 import Maybe exposing (Maybe)
 
 
@@ -28,6 +28,7 @@ all =
         , test_lens_method_compose
         , test_lens_method_modify
         , test_lens_method_zip
+        , test_lens_method_modifyAndMerge
         ]
 
 
@@ -199,3 +200,22 @@ test_lens_method_zip =
         investigator = Check.Investigator.tuple ( addresses, string )
     in
         test "Lens.zip" actual expected investigator count seed
+
+
+test_lens_method_modifyAndMerge =
+    let
+        lens = placeAddressLens `compose` addressStreetNameLens
+
+        fx a = ( String.reverse a, String.length a )
+
+        merge a b = a + b
+
+        modifiedFx = modifyAndMerge lens fx merge
+
+        actual p = modifiedFx p
+
+        expected ( place, n ) = ( (lens.set (String.reverse (lens.get place)) place), n + (String.length (lens.get place)) )
+
+        investigator = Check.Investigator.tuple ( places, int )
+    in
+        test "Lens.modifyAndMerge" actual expected investigator count seed
