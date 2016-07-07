@@ -19,7 +19,7 @@
     "record"
   ],
   "author": "Artur Opala",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/arturopala/elm-monocle/issues"
   },
