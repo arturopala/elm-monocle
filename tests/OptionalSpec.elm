@@ -1,9 +1,9 @@
-module OptionalSpec (all) where
+module OptionalSpec exposing (all)
 
 import ElmTest exposing (suite, equals, Test)
 import Check exposing (that, is, for, claim, check)
 import Check.Test exposing (test, assert)
-import Check.Investigator exposing (Investigator, tuple, string, list, char, int)
+import Check.Producer exposing (Producer, tuple, string, list, char, int)
 import Random exposing (initialSeed)
 import Random.Int
 import Random.Char
@@ -100,7 +100,7 @@ placeShrinker { name, description, address } =
         `Shrink.andMap` Shrink.noShrink address
 
 
-addressesWithRegion : Investigator Address
+addressesWithRegion : Producer Address
 addressesWithRegion =
     let
         address name town postcode region =
@@ -115,27 +115,27 @@ addressesWithRegion =
 
         generator = Random.map4 address Random.String.anyEnglishWord Random.String.anyEnglishWord (Random.String.word 5 Random.Char.numberForm) Random.String.anyEnglishWord
     in
-        Check.Investigator.investigator generator addressShrinker
+        Check.Producer generator addressShrinker
 
 
-addressesWithoutRegion : Investigator Address
+addressesWithoutRegion : Producer Address
 addressesWithoutRegion =
     let
         address name town postcode = { streetName = name, streetType = Street, floor = Nothing, town = town, region = Nothing, postcode = postcode, country = US }
 
         generator = Random.map3 address Random.String.anyEnglishWord Random.String.anyEnglishWord (Random.String.word 5 Random.Char.numberForm)
     in
-        Check.Investigator.investigator generator addressShrinker
+        Check.Producer generator addressShrinker
 
 
-places : Investigator Place
+places : Producer Place
 places =
     let
         addressGenerator = Random.map (\a -> Just a) addressesWithRegion.generator
 
         generator = Random.map3 Place Random.String.anyEnglishWord Random.String.anyEnglishWord addressGenerator
     in
-        Check.Investigator.investigator generator placeShrinker
+        Check.Producer generator placeShrinker
 
 
 addressRegionOptional : Optional Address String
@@ -178,9 +178,9 @@ string2CharListIso =
     Iso String.toList String.fromList
 
 
-numbers : Investigator String
+numbers : Producer String
 numbers =
-    Check.Investigator.investigator (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
+    Check.Producer (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
 
 
 test_optional_property_identity_when_just =
@@ -217,7 +217,7 @@ test_optional_property_reverse_identity =
 
         expected ( _, r ) = Just r
 
-        investigator = Check.Investigator.tuple ( addressesWithoutRegion, string )
+        investigator = Check.Producer.tuple ( addressesWithoutRegion, string )
     in
         test "For all a: A, set a r |> getOption == Just a" actual expected investigator count seed
 
@@ -256,7 +256,7 @@ test_optional_method_compose =
 
         expected ( a, i ) = { a | region = Just (toString i) }
 
-        investigator = Check.Investigator.tuple ( addressesWithRegion, int )
+        investigator = Check.Producer.tuple ( addressesWithRegion, int )
     in
         test "Optional.compose" actual expected investigator count seed
 
@@ -269,7 +269,7 @@ test_optional_method_composeLens =
 
         expected ( a, cl ) = { a | region = Just (String.fromList cl) }
 
-        investigator = Check.Investigator.tuple ( addressesWithRegion, list char )
+        investigator = Check.Producer.tuple ( addressesWithRegion, list char )
     in
         test "Optional.composeLens" actual expected investigator count seed
 
@@ -346,7 +346,7 @@ test_optional_method_zip =
 
         expected x = Just x
 
-        investigator = Check.Investigator.tuple ( string, string )
+        investigator = Check.Producer.tuple ( string, string )
     in
         test "Optional.zip" actual expected investigator count seed
 
@@ -359,6 +359,6 @@ test_optional_method_fromLens =
 
         expected ( a, s ) = { a | streetName = s }
 
-        investigator = Check.Investigator.tuple ( addressesWithRegion, string )
+        investigator = Check.Producer.tuple ( addressesWithRegion, string )
     in
         test "Optional.fromLens" actual expected investigator count seed

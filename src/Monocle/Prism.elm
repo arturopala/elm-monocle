@@ -1,4 +1,4 @@
-module Monocle.Prism (Prism, isMatching, modify, modifyOption, compose, composeIso, fromIso) where
+module Monocle.Prism exposing (Prism, isMatching, modify, modifyOption, compose, composeIso, fromIso)
 
 {-| A Prism is a tool which optionally converts elements of type A into elements of type B and back.
 

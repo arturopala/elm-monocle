@@ -1,4 +1,4 @@
-module Monocle.Lens (Lens, fromIso, compose, modify, zip, modifyAndMerge) where
+module Monocle.Lens exposing (Lens, fromIso, compose, modify, zip, modifyAndMerge)
 
 {-| A Lens is a functional concept which solves a very common problem:
     how to easily update a complex immutable structure,

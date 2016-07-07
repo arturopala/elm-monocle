@@ -1,9 +1,9 @@
-module LensSpec (all) where
+module LensSpec exposing (all)
 
 import ElmTest exposing (suite, equals, Test)
 import Check exposing (that, is, for, claim, check)
 import Check.Test exposing (test, assert)
-import Check.Investigator exposing (Investigator, tuple, string, list, char, int)
+import Check.Producer exposing (Producer, tuple, string, list, char, int)
 import Random exposing (initialSeed)
 import Random.Int
 import Random.Char
@@ -93,22 +93,22 @@ placeShrinker { name, description, address } =
         `Shrink.andMap` addressShrinker address
 
 
-addresses : Investigator Address
+addresses : Producer Address
 addresses =
     let
         address name town postcode = { streetName = name, streetType = Street, floor = Nothing, town = town, region = Nothing, postcode = postcode, country = US }
 
         generator = Random.map3 address Random.String.anyEnglishWord Random.String.anyEnglishWord (Random.String.word 5 Random.Char.numberForm)
     in
-        Check.Investigator.investigator generator addressShrinker
+        Check.Producer generator addressShrinker
 
 
-places : Investigator Place
+places : Producer Place
 places =
     let
         generator = Random.map3 Place Random.String.anyEnglishWord Random.String.anyEnglishWord addresses.generator
     in
-        Check.Investigator.investigator generator placeShrinker
+        Check.Producer generator placeShrinker
 
 
 addressStreetNameLens : Lens Address String
@@ -152,7 +152,7 @@ test_lens_property_identity_reverse =
 
         expected ( x, _ ) = x
 
-        investigator = Check.Investigator.tuple ( string, addresses )
+        investigator = Check.Producer.tuple ( string, addresses )
     in
         test "For all a: A, get (set a a) == a" actual expected investigator count seed
 
@@ -165,7 +165,7 @@ test_lens_method_compose =
 
         expected ( sn, _ ) = sn
 
-        investigator = Check.Investigator.tuple ( string, places )
+        investigator = Check.Producer.tuple ( string, places )
     in
         test "Lens.compose" actual expected investigator count seed
 
@@ -197,7 +197,7 @@ test_lens_method_zip =
 
         expected x = x
 
-        investigator = Check.Investigator.tuple ( addresses, string )
+        investigator = Check.Producer.tuple ( addresses, string )
     in
         test "Lens.zip" actual expected investigator count seed
 
@@ -216,6 +216,6 @@ test_lens_method_modifyAndMerge =
 
         expected ( place, n ) = ( (lens.set (String.reverse (lens.get place)) place), n + (String.length (lens.get place)) )
 
-        investigator = Check.Investigator.tuple ( places, int )
+        investigator = Check.Producer.tuple ( places, int )
     in
         test "Lens.modifyAndMerge" actual expected investigator count seed

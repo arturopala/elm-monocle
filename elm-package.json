@@ -5,7 +5,6 @@
     "license": "BSD3",
     "source-directories": [
         "src",
-        "test",
         "example"
     ],
     "exposed-modules": [
@@ -15,12 +14,7 @@
         "Monocle.Optional"
     ],
     "dependencies": {
-        "elm-lang/core": "3.0.0 <= v < 4.0.0",
-        "laszlopandy/elm-console": "1.1.0 <= v < 2.0.0",
-        "NoRedInk/elm-random-extra": "2.0.0 <= v < 3.0.0",
-        "NoRedInk/elm-check": "2.0.0 <= v < 3.0.0",
-        "NoRedInk/elm-shrink": "1.0.3 <= v < 2.0.0",
-        "deadfoxygrandpa/elm-test": "3.0.1 <= v < 4.0.0"
+        "elm-lang/core": "4.0.1 <= v < 5.0.0"
     },
-    "elm-version": "0.16.0 <= v < 0.17.0"
+    "elm-version": "0.17.0 <= v < 0.18.0"
 }

@@ -1,9 +1,9 @@
-module PrismSpec (all) where
+module PrismSpec exposing (all)
 
 import ElmTest exposing (suite, equals, Test)
 import Check exposing (that, is, for, claim, check)
 import Check.Test exposing (test, assert)
-import Check.Investigator exposing (Investigator, tuple, string, list, char, int)
+import Check.Producer exposing (Producer, tuple, string, list, char, int)
 import Random exposing (initialSeed)
 import Random.Int
 import Random.Extra exposing (constant, merge)
@@ -42,14 +42,14 @@ seed =
     initialSeed 21882981
 
 
-numbers : Investigator String
+numbers : Producer String
 numbers =
-    Check.Investigator.investigator (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
+    Check.Producer (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
 
 
-numbersAndStrings : Investigator String
+numbersAndStrings : Producer String
 numbersAndStrings =
-    Check.Investigator.investigator (merge numbers.generator string.generator) string.shrinker
+    Check.Producer (merge numbers.generator string.generator) string.shrinker
 
 
 string2IntPrism : Prism String Int

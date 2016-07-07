@@ -1,4 +1,4 @@
-module OptionalExample (..) where
+module OptionalExample exposing (..)
 
 import Monocle.Optional exposing (Optional)
 import Monocle.Lens exposing (Lens)

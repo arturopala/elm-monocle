@@ -1,4 +1,4 @@
-module Monocle.Iso (Iso, reverse, modify, compose) where
+module Monocle.Iso exposing (Iso, reverse, modify, compose)
 
 {-| An Iso is a tool which converts elements of type A into elements of type B and back without loss.
 

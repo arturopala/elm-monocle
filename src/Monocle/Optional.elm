@@ -1,4 +1,4 @@
-module Monocle.Optional (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, zip) where
+module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, zip)
 
 {-| A Optional is a weaker Lens and a weaker Prism
 

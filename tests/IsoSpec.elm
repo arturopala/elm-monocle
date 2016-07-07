@@ -1,9 +1,9 @@
-module IsoSpec (all) where
+module IsoSpec exposing (all)
 
 import ElmTest exposing (suite, equals, Test)
 import Check exposing (that, is, for, claim, check)
 import Check.Test exposing (test, assert)
-import Check.Investigator exposing (Investigator, tuple, string, list, char)
+import Check.Producer exposing (Producer, tuple, string, list, char)
 import Random exposing (initialSeed)
 import Random.Extra exposing (constant)
 import Shrink

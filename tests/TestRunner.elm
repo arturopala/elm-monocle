@@ -1,6 +1,6 @@
-module Main where
+module Main exposing (..)
 
-import Signal exposing (Signal)
+{--import Signal exposing (Signal)
 
 import ElmTest exposing (consoleRunner)
 import Console exposing (IO, run)
@@ -12,4 +12,4 @@ console : IO ()
 console = consoleRunner Tests.all
 
 port runner : Signal (Task.Task x ())
-port runner = run console
+port runner = run console -}
