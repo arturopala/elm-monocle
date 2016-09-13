@@ -11,7 +11,8 @@
         "Monocle.Iso",
         "Monocle.Prism",
         "Monocle.Lens",
-        "Monocle.Optional"
+        "Monocle.Optional",
+        "Monocle.Common"
     ],
     "dependencies": {
         "elm-lang/core": "4.0.1 <= v < 5.0.0"
