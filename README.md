@@ -258,6 +258,61 @@ A Optional is a weaker Lens and a weaker Prism.
     modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
 ```
 
+## Common
+Common lenses/prisms/optionals that most projects will use.
+
+#### Convenient infix operator for composing optionals.
+```elm
+    .getOption (maybe => array 2) (Just [10..15])
+    > 12
+```
+####  Step into a `Maybe` value.
+```elm  
+    maybe.set 5 Nothing
+    > Just 5
+```
+####  Step into an `Array` at the given index.
+```elm
+    array.getOption 2 (Array.fromList [10..15])
+    > Just 12
+
+    array.getOption 8 (Array.fromList [10..15])
+    > Nothing
+```
+####  Step into a `Dict` with the given key.
+```elm
+    dict.getOption "Tom" (Dict.fromList [("Tom","Cat")])
+    > Just "Cat"
+
+    dict.getOption "Jerry" (Dict.fromList [("Tom","Cat")])
+    > Nothing
+```
+####  Step into the success value of a `Result`.
+```elm    
+    result.getOption (Ok 5)
+    > Just 5
+
+    result.getOption (Err "500")
+    > Nothing
+```
+####  Step into a record with an `id` key.
+Since records with an `id` field are incredible common, this is
+included for convenience. It also serves as a simple recipe for
+creating record lenses.
+```elm   
+    id.get {id = 1000, name = ...}
+    > Just 1000
+```
+####  Step into the first element of a pair.
+```elm
+    first.get ('a', 'b')
+    > Just 'a'
+```
+####  Step into the second element of a pair.
+```elm    
+    second.get ('a', 'b')
+    > Just 'b'
+```
 
 # Build
 
