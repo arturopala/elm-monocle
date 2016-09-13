@@ -12,3 +12,5 @@ node_modules
 
 # added by GitSavvy
 /documentation.md
+
+/npm-debug.log

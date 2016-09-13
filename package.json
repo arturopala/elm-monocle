@@ -4,7 +4,9 @@
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "elm-make ./src/**/*.elm --output monocle.js",
-    "compile-and-watch": "echo 'Compiling elm-monocle ...' && npm run compile && onchange './src/**/*.elm' -v -- npm run compile"
+    "compile-and-watch": "echo 'Compiling elm-monocle ...' && npm run compile && onchange './src/**/*.elm' -v -- npm run compile",
+    "test": "elm-test tests/Main.elm",
+    "test-and-watch": "echo 'Testing elm-monocle ...' && npm test && onchange '**/*.elm' -v -- npm test"
   },
   "repository": {
     "type": "git",

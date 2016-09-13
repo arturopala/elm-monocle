@@ -1,6 +1,6 @@
 module PrismSpec exposing (all)
 
-import ElmTest exposing (suite, equals, Test)
+import Legacy.ElmTest exposing (suite, equals, Test)
 import Check exposing (that, is, for, claim, check)
 import Check.Test exposing (test, assert)
 import Check.Producer exposing (Producer, tuple, string, list, char, int)
