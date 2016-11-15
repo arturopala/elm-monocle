@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/arturopala/elm-monocle#readme",
   "devDependencies": {
-    "elm": "^0.17.0",
+    "elm": "^0.18.0",
     "elm-test":"^0.16.0",
     "onchange": "^2.0.0",
     "ws": "^1.0.1"
