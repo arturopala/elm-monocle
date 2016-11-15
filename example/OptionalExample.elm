@@ -67,12 +67,12 @@ streetNameOfAddress =
 
 regionOfPlace : Optional Place String
 regionOfPlace =
-    addressOfPlace `Monocle.Optional.compose` regionOfAddress
+    Monocle.Optional.compose addressOfPlace regionOfAddress
 
 
 streetNameOfPlace : Optional Place String
 streetNameOfPlace =
-    addressOfPlace `Monocle.Optional.composeLens` streetNameOfAddress
+    Monocle.Optional.composeLens addressOfPlace streetNameOfAddress
 
 
 place : Place

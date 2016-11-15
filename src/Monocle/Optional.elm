@@ -159,11 +159,11 @@ zip left right =
             left.getOption a
                 |> (\ma ->
                         Maybe.andThen
-                            ma
                             (\c ->
                                 right.getOption b
                                     |> Maybe.map (\d -> ( c, d ))
                             )
+                            ma
                    )
 
         set ( c, d ) ( a, b ) =

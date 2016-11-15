@@ -109,7 +109,7 @@ id =
 -}
 first : Lens ( a, b ) a
 first =
-    { get = fst
+    { get = Tuple.first
     , set = \a ( _, b ) -> ( a, b )
     }
 
@@ -121,6 +121,6 @@ first =
 -}
 second : Lens ( a, b ) b
 second =
-    { get = snd
+    { get = Tuple.second
     , set = \b ( a, _ ) -> ( a, b )
     }
