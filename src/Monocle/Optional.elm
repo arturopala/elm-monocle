@@ -157,14 +157,11 @@ zip left right =
     let
         getOption ( a, b ) =
             left.getOption a
-                |> (\ma ->
-                        Maybe.andThen
-                            ma
-                            (\c ->
-                                right.getOption b
-                                    |> Maybe.map (\d -> ( c, d ))
-                            )
-                   )
+                |>  Maybe.andThen
+                        (\c ->
+                            right.getOption b
+                                |> Maybe.map (\d -> ( c, d ))
+                        )
 
         set ( c, d ) ( a, b ) =
             ( left.set c a, right.set d b )
