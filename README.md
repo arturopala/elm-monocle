@@ -78,12 +78,12 @@ streetNameOfAddress =
 
 regionOfPlace : Optional Place String
 regionOfPlace =
-    addressOfPlace `Monocle.Optional.compose` regionOfAddress
+    Monocle.Optional.compose addressOfPlace regionOfAddress
 
 
 streetNameOfPlace : Optional Place String
 streetNameOfPlace =
-    addressOfPlace `Monocle.Optional.composeLens` streetNameOfAddress
+    Monocle.Optional.composeLens addressOfPlace streetNameOfAddress
 
 
 place : Place
@@ -198,7 +198,7 @@ A Lens is a functional concept which solves a very common problem: how to easily
             Lens get set
 
     placeStreetName: Lens Place String
-    placeStreetName = placeAddressLens `compose` addressStreetNameLens
+    placeStreetName = compose placeAddressLens addressStreetNameLens
 
     myPlace = Place "my" (Address "Elm" "00001" "Daisytown")
     placeStreetName.get myPlace == "Elm"
@@ -237,13 +237,13 @@ A Optional is a weaker Lens and a weaker Prism.
     string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
 
     addressRegionIntOptional: Optional Address Int
-    addressRegionIntOptional = addressRegionOptional `compose` (fromPrism string2IntPrism)
+    addressRegionIntOptional = compose addressRegionOptional (fromPrism string2IntPrism)
 
     string2CharListIso : Iso String (List Char)
     string2CharListIso = Iso String.toList String.fromList
 
     addressRegionListCharOptional: Optional Address (List Char)
-    addressRegionListCharOptional = addressRegionOptional `composeLens` (fromIso string2CharListIso)
+    addressRegionListCharOptional = composeLens addressRegionOptional (fromIso string2CharListIso)
 
     modifyRegion: String -> String
     modifyRegion region = String.reverse region
