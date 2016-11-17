@@ -27,7 +27,7 @@ module Monocle.Lens exposing (Lens, fromIso, compose, modify, zip, modifyAndMerg
             Lens get set
 
     placeStreetName: Lens Place String
-    placeStreetName = placeAddressLens `compose` addressStreetNameLens
+    placeStreetName = compose placeAddressLens addressStreetNameLens
 
 # Derived methods
 @docs compose, modify, modifyAndMerge, zip

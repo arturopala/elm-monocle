@@ -41,7 +41,7 @@ type alias Optional a b =
     string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
 
     addressRegionIntOptional: Optional Address Int
-    addressRegionIntOptional = addressRegionOptional `compose` (fromPrism string2IntPrism)
+    addressRegionIntOptional = compose addressRegionOptional (fromPrism string2IntPrism)
 -}
 compose : Optional a b -> Optional b c -> Optional a c
 compose outer inner =
@@ -69,7 +69,7 @@ compose outer inner =
     string2CharListIso = Iso String.toList String.fromList
 
     addressRegionListCharOptional: Optional Address (List Char)
-    addressRegionListCharOptional = addressRegionOptional `composeLens` (fromIso string2CharListIso)
+    addressRegionListCharOptional = composeLens addressRegionOptional (fromIso string2CharListIso)
 -}
 composeLens : Optional a b -> Lens b c -> Optional a c
 composeLens opt lens =
