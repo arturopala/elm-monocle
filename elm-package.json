@@ -1,5 +1,5 @@
 {
-    "version": "1.3.2",
+    "version": "1.4.0",
     "summary": "Library providing functional tools to manipulate complex records",
     "repository": "https://github.com/arturopala/elm-monocle.git",
     "license": "MIT",

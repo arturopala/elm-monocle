@@ -1,4 +1,4 @@
-module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, zip)
+module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, modify2, modify3, zip, tuple, tuple3)
 
 {-| A Optional is a weaker Lens and a weaker Prism
 
@@ -6,7 +6,7 @@ module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, compos
 @docs Optional
 
 # Derived methods
-@docs compose, composeLens, modifyOption, modify, zip
+@docs compose, composeLens, modifyOption, modify, modify2, modify3, zip, tuple, tuple3
 
 # Conversion
 @docs fromPrism, fromLens
@@ -100,9 +100,10 @@ composeLens opt lens =
         modifyAddressRegion address = Optional.modifyOption addressRegionOptional modifyRegion address
 -}
 modifyOption : Optional a b -> (b -> b) -> a -> Maybe a
-modifyOption opt f =
+modifyOption opt fx =
     let
-        mf a = opt.getOption a |> Maybe.map f |> Maybe.map (\b -> opt.set b a)
+        mf a =
+            opt.getOption a |> Maybe.map fx |> Maybe.map (\b -> opt.set b a)
     in
         mf
 
@@ -116,9 +117,46 @@ modifyOption opt f =
         modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
 -}
 modify : Optional a b -> (b -> b) -> a -> a
-modify opt f =
+modify opt fx =
     let
-        mf a = modifyOption opt f a |> Maybe.withDefault a
+        mf a =
+            modifyOption opt fx a |> Maybe.withDefault a
+    in
+        mf
+
+
+{-| Modifies given function `(b,d) -> (b,d)` to be `(a,c) -> (a,c)` using `Optional a b` and `Optional c d`
+
+    Function will be invoked ONLY when for ALL arguments `a` and `c` method `Optional.getOption` returns some value.
+-}
+modify2 : Optional a b -> Optional c d -> (( b, d ) -> ( b, d )) -> ( a, c ) -> ( a, c )
+modify2 opt1 opt2 fx =
+    let
+        mf ( a, c ) =
+            case ( opt1.getOption a, opt2.getOption c ) of
+                ( Just b, Just d ) ->
+                    ( b, d ) |> fx |> (\( b1, d1 ) -> ( opt1.set b1 a, opt2.set d1 c ))
+
+                _ ->
+                    ( a, c )
+    in
+        mf
+
+
+{-| Modifies given function `( b, d, f ) -> ( b, d, f )` to be `( a, c, e ) -> ( a, c, e )` using `Optional a b` and `Optional c d` and `Optional e f`
+
+    Function will be invoked ONLY when for ALL arguments `a`,`c`,`f` method `Optional.getOption` returns some value.
+-}
+modify3 : Optional a b -> Optional c d -> Optional e f -> (( b, d, f ) -> ( b, d, f )) -> ( a, c, e ) -> ( a, c, e )
+modify3 opt1 opt2 opt3 fx =
+    let
+        mf ( a, c, e ) =
+            case ( opt1.getOption a, opt2.getOption c, opt3.getOption e ) of
+                ( Just b, Just d, Just f ) ->
+                    ( b, d, f ) |> fx |> (\( b1, d1, f1 ) -> ( opt1.set b1 a, opt2.set d1 c, opt3.set f1 e ))
+
+                _ ->
+                    ( a, c, e )
     in
         mf
 
@@ -135,7 +173,8 @@ modify opt f =
 fromPrism : Prism a b -> Optional a b
 fromPrism prism =
     let
-        set b _ = prism.reverseGet b
+        set b _ =
+            prism.reverseGet b
     in
         Optional prism.getOption set
 
@@ -145,7 +184,8 @@ fromPrism prism =
 fromLens : Lens a b -> Optional a b
 fromLens lens =
     let
-        getOption a = Just (lens.get a)
+        getOption a =
+            Just (lens.get a)
     in
         Optional getOption lens.set
 
@@ -157,13 +197,55 @@ zip left right =
     let
         getOption ( a, b ) =
             left.getOption a
-                |>  Maybe.andThen
-                        (\c ->
-                            right.getOption b
-                                |> Maybe.map (\d -> ( c, d ))
-                        )
+                |> Maybe.andThen
+                    (\c ->
+                        right.getOption b
+                            |> Maybe.map (\d -> ( c, d ))
+                    )
 
         set ( c, d ) ( a, b ) =
             ( left.set c a, right.set d b )
+    in
+        Optional getOption set
+
+
+{-| Tuple `Optional a b` with `Optional a c` and returns `Optional a (b,c)`
+
+    Method `Optional.getOption` returns pair of values only when both given optionals return some value.
+-}
+tuple : Optional a b -> Optional a c -> Optional a ( b, c )
+tuple left right =
+    let
+        getOption a =
+            case ( left.getOption a, right.getOption a ) of
+                ( Just b, Just d ) ->
+                    Just ( b, d )
+
+                _ ->
+                    Nothing
+
+        set ( b, c ) a =
+            right.set c (left.set b a)
+    in
+        Optional getOption set
+
+
+{-| Tuple `Optional a b` with `Optional a c` with `Optional a d` and returns `Optional a (b,c,d)`
+
+    Method `Optional.getOption` returns triple of values only when all given optionals return some value.
+-}
+tuple3 : Optional a b -> Optional a c -> Optional a d -> Optional a ( b, c, d )
+tuple3 first second third =
+    let
+        getOption a =
+            case ( first.getOption a, second.getOption a, third.getOption a ) of
+                ( Just b, Just d, Just f ) ->
+                    Just ( b, d, f )
+
+                _ ->
+                    Nothing
+
+        set ( b, c, d ) a =
+            third.set d (second.set c (first.set b a))
     in
         Optional getOption set
