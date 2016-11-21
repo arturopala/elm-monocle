@@ -323,20 +323,8 @@ creating record lenses.
 
 ## Compile
 
-Run
-
-`npm run compile`
-
-or 
-
-`npm run compile-and-watch`
+Run `npm run compile`
 
 ## Test
 
-Run
-
-`npm test`
-
-or
-
-`npm test-and-watch`
+Run `elm-test`

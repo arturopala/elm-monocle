@@ -1,25 +1,20 @@
 module Tests exposing (..)
 
-import ElmTest exposing (suite, equals, Test)
+import Test exposing (..)
+import Expect
+import Fuzz exposing (list, int, tuple, string)
+import String
 import IsoSpec
 import PrismSpec
 import LensSpec
 import OptionalSpec
-import OptionalExample
-
-import Element exposing (show)
 
 
 all : Test
 all =
-    suite
-        "A Monocle test suite"
+    describe "Elm Monocle specification"
         [ IsoSpec.all
         , PrismSpec.all
         , LensSpec.all
         , OptionalSpec.all
         ]
-
-main : Element
-main = 
-    show (stringRunner tests)

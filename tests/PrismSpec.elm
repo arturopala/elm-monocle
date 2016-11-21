@@ -1,24 +1,16 @@
 module PrismSpec exposing (all)
 
-import ElmTest exposing (suite, equals, Test)
-import Check exposing (that, is, for, claim, check)
-import Check.Test exposing (test, assert)
-import Check.Producer exposing (Producer, tuple, string, list, char, int)
-import Random exposing (initialSeed)
-import Random.Int
-import Random.Extra exposing (constant, merge)
-import Shrink
+import Test exposing (..)
+import Expect
+import Fuzz exposing (Fuzzer, list, int, tuple, string, char)
 import String
-import Char
-import Maybe
-import Result
 import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
 
 
 all : Test
 all =
-    suite
+    describe
         "A Prism specification"
         [ test_prism_property_partial_round_trip_one_way
         , test_prism_property_no_round_trip_when_not_matching
@@ -30,26 +22,6 @@ all =
         , test_prism_method_fromIso
         , test_prism_method_fromIso_reverseGet
         ]
-
-
-count : Int
-count =
-    100
-
-
-seed : Random.Seed
-seed =
-    initialSeed 21882981
-
-
-numbers : Producer String
-numbers =
-    Check.Producer (Random.Int.intLessThan 10000000 |> Random.map (abs >> toString)) Shrink.string
-
-
-numbersAndStrings : Producer String
-numbersAndStrings =
-    Check.Producer (merge numbers.generator string.generator) string.shrinker
 
 
 string2IntPrism : Prism String Int
@@ -67,9 +39,11 @@ float2IntPrism =
     let
         getOption float =
             let
-                int = truncate float
+                int =
+                    truncate float
 
-                back = toFloat int
+                back =
+                    toFloat int
             in
                 if (float == back) then
                     Just int
@@ -79,136 +53,196 @@ float2IntPrism =
         Prism getOption toFloat
 
 
+numbers : Fuzzer String
+numbers =
+    Fuzz.map toString int
+
+
+notnumbers : Fuzzer String
+notnumbers =
+    Fuzz.map (\s -> String.append "_" s) string
+
+
+numbersAndNotNumbers : Fuzzer String
+numbersAndNotNumbers =
+    Fuzz.frequency [ ( 0.5, numbers ), ( 0.5, notnumbers ) ]
+        |> Result.withDefault string
+
+
+test_prism_property_partial_round_trip_one_way : Test
 test_prism_property_partial_round_trip_one_way =
     let
-        prism = string2IntPrism
+        prism =
+            string2IntPrism
 
-        actual x = x |> prism.getOption |> Maybe.map prism.reverseGet
-
-        expected x = Just x
-
-        investigator = numbers
+        test s =
+            s
+                |> prism.getOption
+                |> Maybe.map prism.reverseGet
+                |> Expect.equal (Just s)
     in
-        test "For some a: A, getOption a |> Maybe.map reverseGet == Just a" actual expected investigator count seed
+        fuzz numbers "For some a: A, getOption a |> Maybe.map reverseGet == Just a" test
 
 
+test_prism_property_no_round_trip_when_not_matching : Test
 test_prism_property_no_round_trip_when_not_matching =
     let
-        prism = string2IntPrism
+        prism =
+            string2IntPrism
 
-        actual x = x |> prism.getOption |> Maybe.map prism.reverseGet
-
-        expected x = Nothing
-
-        investigator = string
+        test s =
+            s
+                |> prism.getOption
+                |> Maybe.map prism.reverseGet
+                |> Expect.equal Nothing
     in
-        test "For some a: A, getOption a |> Maybe.map reverseGet == Nothing " actual expected investigator count seed
+        fuzz notnumbers "For some a: A, getOption a |> Maybe.map reverseGet == Nothing " test
 
 
+test_prism_property_round_trip_other_way : Test
 test_prism_property_round_trip_other_way =
     let
-        prism = string2IntPrism
+        prism =
+            string2IntPrism
 
-        actual x = x |> prism.reverseGet >> prism.getOption
-
-        expected x = Just x
-
-        investigator = int
+        test i =
+            i
+                |> prism.reverseGet
+                >> prism.getOption
+                |> Expect.equal (Just i)
     in
-        test "For all a: A, getOption (reverseGet a) == Just a " actual expected investigator count seed
+        fuzz int "For all a: A, getOption (reverseGet a) == Just a " test
 
 
+test_prism_method_modify : Test
 test_prism_method_modify =
     let
-        prism = string2IntPrism
+        prism =
+            string2IntPrism
 
-        actual x =
+        computed s =
             let
-                fx i = i * 2
+                fx i =
+                    i * 2
 
-                modified = Monocle.Prism.modify prism fx
+                modified =
+                    Monocle.Prism.modify prism fx
             in
-                modified x
+                modified s
 
-        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString) |> Maybe.withDefault x
+        expected s =
+            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString) |> Maybe.withDefault s
 
-        investigator = numbersAndStrings
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.modify" actual expected investigator count seed
+        fuzz string "Prism method modify" test
 
 
+test_prism_method_modify_option : Test
 test_prism_method_modify_option =
     let
-        prism = string2IntPrism
+        prism =
+            string2IntPrism
 
-        actual x =
+        computed s =
             let
-                fx i = i * 2
+                fx i =
+                    i * 2
 
-                modified = Monocle.Prism.modifyOption prism fx
+                modified =
+                    Monocle.Prism.modifyOption prism fx
             in
-                modified x
+                modified s
 
-        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString)
+        expected s =
+            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString)
 
-        investigator = numbersAndStrings
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.modifyOption" actual expected investigator count seed
+        fuzz numbersAndNotNumbers "Prism method modifyOption" test
 
 
+test_prism_method_compose : Test
 test_prism_method_compose =
     let
-        prism = Monocle.Prism.compose string2FloatPrism float2IntPrism
+        iso =
+            Iso ((*) 10) ((//) 10)
 
-        actual x = prism.getOption x
+        prism =
+            Monocle.Prism.composeIso string2IntPrism iso
 
-        expected x = x |> String.toInt >> Result.toMaybe
+        computed s =
+            prism.getOption s
 
-        investigator = numbersAndStrings
+        expected s =
+            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
+
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.compose" actual expected investigator count seed
+        fuzz numbersAndNotNumbers "Prism method compose" test
 
 
+test_prism_method_composeIso : Test
 test_prism_method_composeIso =
     let
-        iso = Iso ((*) 10) ((//) 10)
+        iso =
+            Iso ((*) 10) ((//) 10)
 
-        prism = Monocle.Prism.composeIso string2IntPrism iso
+        prism =
+            Monocle.Prism.composeIso string2IntPrism iso
 
-        actual x = prism.getOption x
+        computed s =
+            prism.getOption s
 
-        expected x = x |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
+        expected s =
+            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
 
-        investigator = numbersAndStrings
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.composeIso" actual expected investigator count seed
+        fuzz numbersAndNotNumbers "Prism method composeIso" test
 
 
+test_prism_method_fromIso : Test
 test_prism_method_fromIso =
     let
-        iso = Iso String.toList String.fromList
+        iso =
+            Iso String.toList String.fromList
 
-        prism = Monocle.Prism.fromIso iso
+        prism =
+            Monocle.Prism.fromIso iso
 
-        actual x = prism.getOption x
+        computed s =
+            prism.getOption s
 
-        expected x = iso.get x |> Just
+        expected s =
+            iso.get s |> Just
 
-        investigator = string
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.fromIso" actual expected investigator count seed
+        fuzz string "Prism method fromIso" test
 
 
+test_prism_method_fromIso_reverseGet : Test
 test_prism_method_fromIso_reverseGet =
     let
-        iso = Iso String.fromList String.toList
+        iso =
+            Iso String.fromList String.toList
 
-        prism = Monocle.Prism.fromIso iso
+        prism =
+            Monocle.Prism.fromIso iso
 
-        actual x = prism.reverseGet x
+        computed s =
+            prism.reverseGet s
 
-        expected x = iso.reverseGet x
+        expected s =
+            iso.reverseGet s
 
-        investigator = string
+        test s =
+            Expect.equal (computed s) (expected s)
     in
-        test "Prism.fromIso.reverseGet" actual expected investigator count seed
+        fuzz string "Prism method fromIso when reverseGet" test

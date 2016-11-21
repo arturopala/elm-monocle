@@ -1,37 +1,23 @@
 module IsoSpec exposing (all)
 
-import ElmTest exposing (suite, equals, Test)
-import Check exposing (that, is, for, claim, check)
-import Check.Test exposing (test, assert)
-import Check.Producer exposing (Producer, tuple, string, list, char)
-import Random exposing (initialSeed)
-import Random.Extra exposing (constant)
-import Shrink
+import Test exposing (..)
+import Expect
+import Fuzz exposing (list, int, tuple, string, char)
 import String
-import Char
 import Monocle.Iso exposing (Iso)
 
 
 all : Test
 all =
-    suite
-        "An Iso specification"
-        [ test_iso_property_identity
+    describe "An Iso specification"
+        [ test_iso_function_get
+        , test_iso_function_reverse_get
+        , test_iso_property_identity
         , test_iso_property_identity_reversed
         , test_iso_method_reverse
         , test_iso_method_modify
         , test_iso_method_compose
         ]
-
-
-count : Int
-count =
-    100
-
-
-seed : Random.Seed
-seed =
-    initialSeed 21882981
 
 
 string2CharListIso : Iso String (List Char)
@@ -44,72 +30,95 @@ charList2StringIso =
     Iso String.fromList String.toList
 
 
+test_iso_function_get : Test
+test_iso_function_get =
+    let
+        iso =
+            string2CharListIso
+
+        test s =
+            s |> iso.get |> Expect.equal (String.toList s)
+    in
+        fuzz string "test get function" test
+
+
+test_iso_function_reverse_get : Test
+test_iso_function_reverse_get =
+    let
+        iso =
+            string2CharListIso
+
+        test s =
+            (String.toList s) |> iso.reverseGet |> Expect.equal s
+    in
+        fuzz string "test reverseGet function" test
+
+
+test_iso_property_identity : Test
 test_iso_property_identity =
     let
-        iso = string2CharListIso
+        iso =
+            string2CharListIso
 
-        actual x = x |> iso.get >> iso.reverseGet
-
-        expected x = x
-
-        investigator = string
+        test s =
+            s |> iso.get >> iso.reverseGet |> Expect.equal s
     in
-        test "For all a: A, reverseGet (get a) == a" actual expected investigator count seed
+        fuzz string "test identity property: reverseGet(get(x)) == x" test
 
 
+test_iso_property_identity_reversed : Test
 test_iso_property_identity_reversed =
     let
-        iso = charList2StringIso
+        iso =
+            charList2StringIso
 
-        actual x = x |> iso.reverseGet >> iso.get
-
-        expected x = x
-
-        investigator = string
+        test s =
+            s |> iso.reverseGet >> iso.get |> Expect.equal s
     in
-        test "For all a: A, get (reverseGet a) == a " actual expected investigator count seed
+        fuzz string "test identity property reversed: get(reverseGet(x)) == x" test
 
 
+test_iso_method_reverse : Test
 test_iso_method_reverse =
     let
-        iso = Monocle.Iso.reverse string2CharListIso
+        iso =
+            string2CharListIso
 
-        actual x = x |> iso.get >> iso.reverseGet
+        isor =
+            Monocle.Iso.reverse iso
 
-        expected x = x
-
-        investigator = list char
+        test s =
+            Expect.equal (iso.get s) (isor.reverseGet s)
     in
-        test "Iso.reverse" actual expected investigator count seed
+        fuzz string "test reverse method" test
 
 
+test_iso_method_modify : Test
 test_iso_method_modify =
     let
-        iso = string2CharListIso
+        iso =
+            string2CharListIso
 
-        actual x =
+        test s ch =
             let
-                fx xs = 'x' :: xs
+                fx xs =
+                    ch :: xs
 
-                modified = Monocle.Iso.modify iso fx
+                modified =
+                    Monocle.Iso.modify iso fx
             in
-                modified x
-
-        expected x = String.cons 'x' x
-
-        investigator = string
+                modified s |> Expect.equal (String.cons ch s)
     in
-        test "Iso.modify" actual expected investigator count seed
+        fuzz2 string char "test modify method" test
 
 
+test_iso_method_compose : Test
 test_iso_method_compose =
     let
-        iso = Monocle.Iso.compose string2CharListIso charList2StringIso
+        iso =
+            Monocle.Iso.compose string2CharListIso charList2StringIso
 
-        actual x = iso.get x
-
-        expected x = x
-
-        investigator = string
+        test s =
+            s |> iso.get |> Expect.equal s
     in
-        test "Iso.compose" actual expected investigator count seed
+        fuzz string "test compose method" test

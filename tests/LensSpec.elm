@@ -1,18 +1,9 @@
 module LensSpec exposing (all)
 
-import ElmTest exposing (suite, equals, Test)
-import Check exposing (that, is, for, claim, check)
-import Check.Test exposing (test, assert)
-import Check.Producer exposing (Producer, tuple, string, list, char, int)
-import Random exposing (initialSeed)
-import Random.Int
-import Random.Char
-import Random.String
-import Random.Extra exposing (constant, merge)
-import Shrink
+import Test exposing (..)
+import Expect
+import Fuzz exposing (Fuzzer, list, int, tuple, string, char)
 import String
-import Char
-import Result
 import Monocle.Iso exposing (Iso)
 import Monocle.Prism exposing (Prism)
 import Monocle.Lens exposing (Lens, compose, modify, zip, modifyAndMerge)
@@ -21,7 +12,7 @@ import Maybe exposing (Maybe)
 
 all : Test
 all =
-    suite
+    describe
         "A Lens specification"
         [ test_lens_property_identity
         , test_lens_property_identity_reverse
@@ -30,16 +21,6 @@ all =
         , test_lens_method_zip
         , test_lens_method_modifyAndMerge
         ]
-
-
-count : Int
-count =
-    100
-
-
-seed : Random.Seed
-seed =
-    initialSeed 21882980
 
 
 type StreetType
@@ -73,50 +54,14 @@ type alias Place =
     }
 
 
-addressShrinker : Shrink.Shrinker Address
-addressShrinker { streetName, streetType, floor, town, region, postcode, country } =
-    Address
-        `Shrink.map` Shrink.string streetName
-        `Shrink.andMap` Shrink.noShrink streetType
-        `Shrink.andMap` Shrink.noShrink floor
-        `Shrink.andMap` Shrink.string town
-        `Shrink.andMap` Shrink.noShrink region
-        `Shrink.andMap` Shrink.noShrink postcode
-        `Shrink.andMap` Shrink.noShrink country
-
-
-placeShrinker : Shrink.Shrinker Place
-placeShrinker { name, description, address } =
-    Place
-        `Shrink.map` Shrink.string name
-        `Shrink.andMap` Shrink.string description
-        `Shrink.andMap` addressShrinker address
-
-
-addresses : Producer Address
-addresses =
-    let
-        address name town postcode = { streetName = name, streetType = Street, floor = Nothing, town = town, region = Nothing, postcode = postcode, country = US }
-
-        generator = Random.map3 address Random.String.anyEnglishWord Random.String.anyEnglishWord (Random.String.word 5 Random.Char.numberForm)
-    in
-        Check.Producer generator addressShrinker
-
-
-places : Producer Place
-places =
-    let
-        generator = Random.map3 Place Random.String.anyEnglishWord Random.String.anyEnglishWord addresses.generator
-    in
-        Check.Producer generator placeShrinker
-
-
 addressStreetNameLens : Lens Address String
 addressStreetNameLens =
     let
-        get a = a.streetName
+        get a =
+            a.streetName
 
-        set sn a = { a | streetName = sn }
+        set sn a =
+            { a | streetName = sn }
     in
         Lens get set
 
@@ -124,98 +69,114 @@ addressStreetNameLens =
 placeAddressLens : Lens Place Address
 placeAddressLens =
     let
-        get p = p.address
+        get p =
+            p.address
 
-        set a p = { p | address = a }
+        set a p =
+            { p | address = a }
     in
         Lens get set
 
 
+addresses : Fuzzer Address
+addresses =
+    let
+        address name town postcode =
+            { streetName = name, streetType = Street, floor = Nothing, town = town, region = Nothing, postcode = postcode, country = US }
+    in
+        Fuzz.map3 address string string string
+
+
+places : Fuzzer Place
+places =
+    Fuzz.map3 Place string string addresses
+
+
 test_lens_property_identity =
     let
-        lens = addressStreetNameLens
+        lens =
+            addressStreetNameLens
 
-        actual x = lens.set (lens.get x) x
-
-        expected x = x
-
-        investigator = addresses
+        test address =
+            lens.set (lens.get address) address |> Expect.equal address
     in
-        test "For all a: A, (set (get a) a) == a" actual expected investigator count seed
+        fuzz addresses "For all a: A, (set (get a) a) == a" test
 
 
 test_lens_property_identity_reverse =
     let
-        lens = addressStreetNameLens
+        lens =
+            addressStreetNameLens
 
-        actual ( x, a ) = lens.get (lens.set x a)
-
-        expected ( x, _ ) = x
-
-        investigator = Check.Producer.tuple ( string, addresses )
+        test ( street, address ) =
+            lens.get (lens.set street address) |> Expect.equal street
     in
-        test "For all a: A, get (set a a) == a" actual expected investigator count seed
+        fuzz (Fuzz.tuple ( string, addresses )) "For all a: A, get (set a a) == a" test
 
 
 test_lens_method_compose =
     let
-        lens = placeAddressLens `compose` addressStreetNameLens
+        lens =
+            compose placeAddressLens addressStreetNameLens
 
-        actual ( sn, p ) = lens.get (lens.set sn p)
-
-        expected ( sn, _ ) = sn
-
-        investigator = Check.Producer.tuple ( string, places )
+        test ( street, place ) =
+            lens.get (lens.set street place) |> Expect.equal street
     in
-        test "Lens.compose" actual expected investigator count seed
+        fuzz (Fuzz.tuple ( string, places )) "Lens compose method" test
 
 
 test_lens_method_modify =
     let
-        f sn = String.reverse sn
+        fx street =
+            String.reverse street
 
-        lens = placeAddressLens `compose` addressStreetNameLens
+        lens =
+            compose placeAddressLens addressStreetNameLens
 
-        actual p = p |> (modify lens f)
+        expected place =
+            lens.set (String.reverse (lens.get place)) place
 
-        expected p = lens.set (String.reverse (lens.get p)) p
-
-        investigator = places
+        test place =
+            place |> (modify lens fx) |> Expect.equal (expected place)
     in
-        test "Lens.modify" actual expected investigator count seed
+        fuzz places "Lens modify method" test
 
 
 test_lens_method_zip =
     let
-        address = Address "test" Street Nothing "test" Nothing "test" US
+        address =
+            Address "test" Street Nothing "test" Nothing "test" US
 
-        place = Place "test" "test" address
+        place =
+            Place "test" "test" address
 
-        lens = placeAddressLens `zip` addressStreetNameLens
+        lens =
+            zip placeAddressLens addressStreetNameLens
 
-        actual x = lens.get (lens.set x ( place, address ))
-
-        expected x = x
-
-        investigator = Check.Producer.tuple ( addresses, string )
+        test x =
+            lens.get (lens.set x ( place, address )) |> Expect.equal x
     in
-        test "Lens.zip" actual expected investigator count seed
+        fuzz (Fuzz.tuple ( addresses, string )) "Lens zip method" test
 
 
 test_lens_method_modifyAndMerge =
     let
-        lens = placeAddressLens `compose` addressStreetNameLens
+        lens =
+            compose placeAddressLens addressStreetNameLens
 
-        fx a = ( String.reverse a, String.length a )
+        fx a =
+            ( String.reverse a, String.length a )
 
-        merge a b = a + b
+        merge a b =
+            a + b
 
-        modifiedFx = modifyAndMerge lens fx merge
+        modifiedFx =
+            modifyAndMerge lens fx merge
 
-        actual p = modifiedFx p
+        expected ( place, n ) =
+            ( (lens.set (String.reverse (lens.get place)) place), n + (String.length (lens.get place)) )
 
-        expected ( place, n ) = ( (lens.set (String.reverse (lens.get place)) place), n + (String.length (lens.get place)) )
-
-        investigator = Check.Producer.tuple ( places, int )
+        test p =
+            modifiedFx p |> Expect.equal (expected p)
     in
-        test "Lens.modifyAndMerge" actual expected investigator count seed
+        fuzz (Fuzz.tuple ( places, int )) "Lens modifyAndMerge method" test
