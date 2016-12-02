@@ -1,4 +1,4 @@
-
+[![Build Status](https://semaphoreci.com/api/v1/arturopala/elm-monocle/branches/master/badge.svg)](https://semaphoreci.com/arturopala/elm-monocle)
 
 elm-monocle
 ===========
