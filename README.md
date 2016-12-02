@@ -263,7 +263,7 @@ Common lenses/prisms/optionals that most projects will use.
 
 #### Convenient infix operator for composing optionals.
 ```elm
-    .getOption (maybe => array 2) (Just [10..15])
+    .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
     > 12
 ```
 ####  Step into a `Maybe` value.
@@ -273,18 +273,18 @@ Common lenses/prisms/optionals that most projects will use.
 ```
 ####  Step into an `Array` at the given index.
 ```elm
-    array.getOption 2 (Array.fromList [10..15])
+    .getOption (array 2) (Array.fromList [ 10, 11, 12, 13 ])
     > Just 12
 
-    array.getOption 8 (Array.fromList [10..15])
+    .getOption (array 8) (Array.fromList [ 10, 11, 12, 13 ])
     > Nothing
 ```
 ####  Step into a `Dict` with the given key.
 ```elm
-    dict.getOption "Tom" (Dict.fromList [("Tom","Cat")])
+    .getOption (dict "Tom") (Dict.fromList [ ( "Tom", "Cat" ) ])
     > Just "Cat"
 
-    dict.getOption "Jerry" (Dict.fromList [("Tom","Cat")])
+    .getOption (dict "Jerry") (Dict.fromList [ ( "Tom", "Cat" ) ])
     > Nothing
 ```
 ####  Step into the success value of a `Result`.
@@ -300,17 +300,17 @@ Since records with an `id` field are incredible common, this is
 included for convenience. It also serves as a simple recipe for
 creating record lenses.
 ```elm   
-    id.get {id = 1000, name = ...}
+    id.get { id = 1000, name = ... }
     > Just 1000
 ```
 ####  Step into the first element of a pair.
 ```elm
-    first.get ('a', 'b')
+    first.get ( 'a', 'b' )
     > Just 'a'
 ```
 ####  Step into the second element of a pair.
 ```elm    
-    second.get ('a', 'b')
+    second.get ( 'a', 'b' )
     > Just 'b'
 ```
 
