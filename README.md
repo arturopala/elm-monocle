@@ -319,7 +319,7 @@ creating record lenses.
 ## Prerequisites
 
 -   Node.js
--   Run `npm install`
+-   Run `npm run install-with-elm`
 
 ## Compile
 
