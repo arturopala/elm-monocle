@@ -1,9 +1,11 @@
 {
   "name": "elm-monocle",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "elm-make ./src/**/*.elm --output monocle.js",
+    "install": "elm-package install -y",
+    "test": "elm-test",
     "test-and-watch": "elm-test --watch"
   },
   "repository": {
