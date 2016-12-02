@@ -8,6 +8,7 @@ import IsoSpec
 import PrismSpec
 import LensSpec
 import OptionalSpec
+import CommonSpec
 
 
 all : Test
@@ -17,4 +18,5 @@ all =
         , PrismSpec.all
         , LensSpec.all
         , OptionalSpec.all
+        , CommonSpec.all
         ]
