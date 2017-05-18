@@ -2,25 +2,35 @@ module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, compos
 
 {-| A Optional is a weaker Lens and a weaker Prism
 
+
 # Definition
+
 @docs Optional
 
+
 # Derived methods
+
 @docs compose, composeLens, modifyOption, modify, modify2, modify3, zip, tuple, tuple3
 
+
 # Conversion
+
 @docs fromPrism, fromLens
+
 
 # Example
 
     addressRegionOptional : Optional Address String
     addressRegionOptional =
         let
-            getOption a = a.region
+            getOption a =
+                a.region
 
-            set r a = { a | region = Just r }
+            set r a =
+                { a | region = Just r }
         in
             Optional getOption set
+
 -}
 
 import Monocle.Prism exposing (Prism)
@@ -38,18 +48,20 @@ type alias Optional a b =
 {-| Composes `Optional a b` with `Optional b c` and returns `Optional a c`
 
     string2IntPrism : Prism String Int
-    string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
+    string2IntPrism =
+        Prism (String.toInt >> Result.toMaybe) toString
 
-    addressRegionIntOptional: Optional Address Int
-    addressRegionIntOptional = compose addressRegionOptional (fromPrism string2IntPrism)
+    addressRegionIntOptional : Optional Address Int
+    addressRegionIntOptional =
+        compose addressRegionOptional (fromPrism string2IntPrism)
+
 -}
 compose : Optional a b -> Optional b c -> Optional a c
 compose outer inner =
     let
         set c a =
             outer.getOption a
-                |> Maybe.map (\b -> inner.set c b)
-                |> Maybe.map (\b -> outer.set b a)
+                |> Maybe.map (inner.set c >> flip outer.set a)
                 |> Maybe.withDefault a
 
         getOption a =
@@ -66,18 +78,20 @@ compose outer inner =
 {-| Composes `Optional a b` with `Lens b c` and returns `Optional a c`
 
     string2CharListIso : Iso String (List Char)
-    string2CharListIso = Iso String.toList String.fromList
+    string2CharListIso =
+        Iso String.toList String.fromList
 
-    addressRegionListCharOptional: Optional Address (List Char)
-    addressRegionListCharOptional = composeLens addressRegionOptional (fromIso string2CharListIso)
+    addressRegionListCharOptional : Optional Address (List Char)
+    addressRegionListCharOptional =
+        composeLens addressRegionOptional (fromIso string2CharListIso)
+
 -}
 composeLens : Optional a b -> Lens b c -> Optional a c
 composeLens opt lens =
     let
         set c a =
             opt.getOption a
-                |> Maybe.map (\b -> lens.set c b)
-                |> Maybe.map (\b -> opt.set b a)
+                |> Maybe.map (lens.set c >> flip opt.set a)
                 |> Maybe.withDefault a
 
         getOption a =
@@ -98,12 +112,13 @@ composeLens opt lens =
 
         modifyAddressRegion: Address -> Maybe Address
         modifyAddressRegion address = Optional.modifyOption addressRegionOptional modifyRegion address
+
 -}
 modifyOption : Optional a b -> (b -> b) -> a -> Maybe a
 modifyOption opt fx =
     let
         mf a =
-            opt.getOption a |> Maybe.map fx |> Maybe.map (\b -> opt.set b a)
+            opt.getOption a |> Maybe.map (fx >> flip opt.set a)
     in
         mf
 
@@ -115,6 +130,7 @@ modifyOption opt fx =
 
         modifyAddressRegion: Address -> Address
         modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
+
 -}
 modify : Optional a b -> (b -> b) -> a -> a
 modify opt fx =
@@ -128,6 +144,7 @@ modify opt fx =
 {-| Modifies given function `(b,d) -> (b,d)` to be `(a,c) -> (a,c)` using `Optional a b` and `Optional c d`
 
     Function will be invoked ONLY when for ALL arguments `a` and `c` method `Optional.getOption` returns some value.
+
 -}
 modify2 : Optional a b -> Optional c d -> (( b, d ) -> ( b, d )) -> ( a, c ) -> ( a, c )
 modify2 opt1 opt2 fx =
@@ -146,6 +163,7 @@ modify2 opt1 opt2 fx =
 {-| Modifies given function `( b, d, f ) -> ( b, d, f )` to be `( a, c, e ) -> ( a, c, e )` using `Optional a b` and `Optional c d` and `Optional e f`
 
     Function will be invoked ONLY when for ALL arguments `a`,`c`,`f` method `Optional.getOption` returns some value.
+
 -}
 modify3 : Optional a b -> Optional c d -> Optional e f -> (( b, d, f ) -> ( b, d, f )) -> ( a, c, e ) -> ( a, c, e )
 modify3 opt1 opt2 opt3 fx =
@@ -167,8 +185,10 @@ modify3 opt1 opt2 opt3 fx =
     string2IntPrism =
         Prism (String.toInt >> Result.toMaybe) toString
 
-    stringIntOptional: Optional String Int
-    stringIntOptional = fromPrism string2IntPrism
+    stringIntOptional : Optional String Int
+    stringIntOptional =
+        fromPrism string2IntPrism
+
 -}
 fromPrism : Prism a b -> Optional a b
 fromPrism prism =
@@ -212,6 +232,7 @@ zip left right =
 {-| Tuple `Optional a b` with `Optional a c` and returns `Optional a (b,c)`
 
     Method `Optional.getOption` returns pair of values only when both given optionals return some value.
+
 -}
 tuple : Optional a b -> Optional a c -> Optional a ( b, c )
 tuple left right =
@@ -233,6 +254,7 @@ tuple left right =
 {-| Tuple `Optional a b` with `Optional a c` with `Optional a d` and returns `Optional a (b,c,d)`
 
     Method `Optional.getOption` returns triple of values only when all given optionals return some value.
+
 -}
 tuple3 : Optional a b -> Optional a c -> Optional a d -> Optional a ( b, c, d )
 tuple3 first second third =
@@ -246,6 +268,6 @@ tuple3 first second third =
                     Nothing
 
         set ( b, c, d ) a =
-            third.set d (second.set c (first.set b a))
+            first.set b a |> second.set c |> third.set d
     in
         Optional getOption set
