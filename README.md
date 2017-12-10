@@ -261,6 +261,29 @@ A Optional is a weaker Lens and a weaker Prism.
 ## Common
 Common lenses/prisms/optionals that most projects will use.
 
+#### Convenient infix operator for composing lenses.
+Allows to chain lens composition for deeply nested structures:
+```elm
+    fromAtoB : Lens A B
+    fromAtoB = Lense .b (\a b -> { a | b = b })
+    fromBtoC : Lens B C
+    fromBtoC = Lense .c (\b c -> { b | c = c })
+    fromCtoD : Lens C D
+    fromCtoD = Lense .d (\c d -> { c | d = d })
+    fromDtoE : Lens D E
+    fromDtoE = Lense .e (\d e -> { d | e = e })
+    fromAtoE : Lens A E
+    fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
+
+    a : A
+    a = { b: { c: { d: { e: "Whatever we want to get" } } } }
+
+    fromAtoE.get a
+    => "Whatever we want to get"
+
+    fromAtoE.set a "What we want to set"
+    => { b: { c: { d: { e: "What we want to set" } } } }
+```
 #### Convenient infix operator for composing optionals.
 ```elm
     .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])

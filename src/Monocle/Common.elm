@@ -2,6 +2,7 @@ module Monocle.Common exposing (..)
 
 {-| Common lenses/prisms/optionals that most projects will use.
 
+@docs (<|>)
 @docs (=>)
 @docs maybe
 @docs array
@@ -16,6 +17,33 @@ import Array exposing (Array)
 import Dict exposing (Dict)
 import Monocle.Lens as Lens exposing (Lens)
 import Monocle.Optional as Optional exposing (Optional)
+
+
+{-| Convenient Infix operator for composing lenses.
+    Allows to chain lens composition for deeply nested structures:
+    fromAtoB : Lens A B
+    fromAtoB = Lense .b (\a b -> { a | b = b })
+    fromBtoC : Lens B C
+    fromBtoC = Lense .c (\b c -> { b | c = c })
+    fromCtoD : Lens C D
+    fromCtoD = Lense .d (\c d -> { c | d = d })
+    fromDtoE : Lens D E
+    fromDtoE = Lense .e (\d e -> { d | e = e })
+    fromAtoE : Lens A E
+    fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
+
+    a : A
+    a = { b: { c: { d: { e: "Whatever we want to get" } } } }
+
+    fromAtoE.get a
+    => "Whatever we want to get"
+
+    fromAtoE.set a "What we want to set"
+    => { b: { c: { d: { e: "What we want to set" } } } }
+-}
+(<|>) : Lens a b -> Lens b c -> Lens a c
+(<|>) =
+    Lens.compose
 
 
 {-| Convenient infix operator for composing optionals.
