@@ -41,7 +41,7 @@ import Monocle.Iso exposing (Iso)
 import Dict exposing (Dict)
 
 
-{-| In order to create Lens we need to suply 2 functions: set and get
+{-| In order to create Lens we need to supply 2 functions: set and get
 -}
 type alias Lens a b =
     { get : a -> b
