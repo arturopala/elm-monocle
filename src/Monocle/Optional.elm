@@ -37,7 +37,7 @@ import Monocle.Prism exposing (Prism)
 import Monocle.Lens exposing (Lens)
 
 
-{-| In order to create Optional we need to suply 2 functions: set and getOption
+{-| In order to create Optional we need to supply 2 functions: set and getOption
 -}
 type alias Optional a b =
     { getOption : a -> Maybe b
