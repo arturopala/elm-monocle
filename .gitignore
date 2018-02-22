@@ -12,3 +12,9 @@ node_modules
 
 # added by GitSavvy
 /documentation.md
+
+/package-lock.json
+
+/yarn-error.log
+
+/yarn.lock
