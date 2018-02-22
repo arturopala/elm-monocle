@@ -21,14 +21,19 @@ import Monocle.Optional as Optional exposing (Optional)
 
 {-| Convenient Infix operator for composing lenses.
     Allows to chain lens composition for deeply nested structures:
+
     fromAtoB : Lens A B
     fromAtoB = Lense .b (\a b -> { a | b = b })
+
     fromBtoC : Lens B C
     fromBtoC = Lense .c (\b c -> { b | c = c })
+
     fromCtoD : Lens C D
     fromCtoD = Lense .d (\c d -> { c | d = d })
+
     fromDtoE : Lens D E
     fromDtoE = Lense .e (\d e -> { d | e = e })
+
     fromAtoE : Lens A E
     fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
 
