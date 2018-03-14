@@ -271,7 +271,7 @@ Allows to chain lens composition for deeply nested structures:
     fromCtoD : Lens C D
     fromCtoD = Lens .d (\d c -> { c | d = d })
     fromDtoE : Lens D E
-    fromDtoE = Lens .e (\d e -> { d | e = e })
+    fromDtoE = Lens .e (\e d -> { d | e = e })
     fromAtoE : Lens A E
     fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
 
