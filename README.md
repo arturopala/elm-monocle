@@ -265,13 +265,13 @@ Common lenses/prisms/optionals that most projects will use.
 Allows to chain lens composition for deeply nested structures:
 ```elm
     fromAtoB : Lens A B
-    fromAtoB = Lense .b (\a b -> { a | b = b })
+    fromAtoB = Lens .b (\b a -> { a | b = b })
     fromBtoC : Lens B C
-    fromBtoC = Lense .c (\b c -> { b | c = c })
+    fromBtoC = Lens .c (\c b -> { b | c = c })
     fromCtoD : Lens C D
-    fromCtoD = Lense .d (\c d -> { c | d = d })
+    fromCtoD = Lens .d (\d c -> { c | d = d })
     fromDtoE : Lens D E
-    fromDtoE = Lense .e (\d e -> { d | e = e })
+    fromDtoE = Lens .e (\d e -> { d | e = e })
     fromAtoE : Lens A E
     fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
 
