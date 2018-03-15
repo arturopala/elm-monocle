@@ -1,6 +1,6 @@
 {
   "name": "elm-monocle",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "elm-make ./src/**/*.elm --output monocle.js",

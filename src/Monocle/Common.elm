@@ -4,6 +4,7 @@ module Monocle.Common exposing (..)
 
 @docs (<|>)
 @docs (=>)
+@docs (=|>)
 @docs maybe
 @docs array
 @docs dict
@@ -11,6 +12,7 @@ module Monocle.Common exposing (..)
 @docs id
 @docs first
 @docs second
+
 -}
 
 import Array exposing (Array)
@@ -20,7 +22,7 @@ import Monocle.Optional as Optional exposing (Optional)
 
 
 {-| Convenient Infix operator for composing lenses.
-    Allows to chain lens composition for deeply nested structures:
+Allows to chain lens composition for deeply nested structures:
 
     fromAtoB : Lens A B
     fromAtoB = Lense .b (\a b -> { a | b = b })
@@ -45,6 +47,7 @@ import Monocle.Optional as Optional exposing (Optional)
 
     fromAtoE.set a "What we want to set"
     => { b: { c: { d: { e: "What we want to set" } } } }
+
 -}
 (<|>) : Lens a b -> Lens b c -> Lens a c
 (<|>) =
@@ -53,8 +56,9 @@ import Monocle.Optional as Optional exposing (Optional)
 
 {-| Convenient infix operator for composing optionals.
 
-   .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
-   > 12
+.getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
+
+> 12
 
 -}
 (=>) : Optional a b -> Optional b c -> Optional a c
@@ -62,10 +66,23 @@ import Monocle.Optional as Optional exposing (Optional)
     Optional.compose
 
 
+{-| Convenient infix operator for composing optional with lens.
+
+.getOption (maybe =|> id) (Just { id = 12 })
+
+> 12
+
+-}
+(=|>) : Optional a b -> Lens b c -> Optional a c
+(=|>) a b =
+    Optional.compose a (Optional.fromLens b)
+
+
 {-| Step into a `Maybe` value.
 
     maybe.set 5 Nothing
     > Just 5
+
 -}
 maybe : Optional (Maybe a) a
 maybe =
@@ -81,6 +98,7 @@ maybe =
 
     .getOption (array 8) (Array.fromList [ 10, 11, 12, 13 ])
     > Nothing
+
 -}
 array : Int -> Optional (Array a) a
 array index =
@@ -96,6 +114,7 @@ array index =
 
     .getOption (dict "Jerry") (Dict.fromList [ ( "Tom", "Cat" ) ])
     > Nothing
+
 -}
 dict : comparable -> Optional (Dict comparable v) v
 dict key =
@@ -111,6 +130,7 @@ dict key =
 
     result.getOption (Err "500")
     > Nothing
+
 -}
 result : Optional (Result e a) a
 result =
@@ -127,6 +147,7 @@ result =
 Since records with an `id` field are incredible common, this is
 included for convenience. It also serves as a simple recipe for
 creating record lenses.
+
 -}
 id : Lens { a | id : b } b
 id =
@@ -139,6 +160,7 @@ id =
 
     first.get ( 'a', 'b' )
     > Just 'a'
+
 -}
 first : Lens ( a, b ) a
 first =
@@ -151,6 +173,7 @@ first =
 
     second.get ( 'a', 'b' )
     > Just 'b'
+
 -}
 second : Lens ( a, b ) b
 second =

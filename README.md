@@ -262,6 +262,11 @@ Allows to chain lens composition for deeply nested structures:
     .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
     > 12
 ```
+#### Convenient infix operator for composing optional with lens.
+```elm
+    .getOption (maybe =|> id) (Just { id = 12 })
+    > 12
+```
 ####  Step into a `Maybe` value.
 ```elm  
     maybe.set 5 Nothing
