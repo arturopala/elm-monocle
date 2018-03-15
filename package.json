@@ -1,6 +1,6 @@
 {
   "name": "elm-monocle",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "elm-make ./src/**/*.elm --output monocle.js",
@@ -30,6 +30,6 @@
   "homepage": "https://github.com/arturopala/elm-monocle#readme",
   "devDependencies": {
     "elm": "^0.18.0",
-    "elm-test":"^0.18.2"
+    "elm-test": "^0.18.2"
   }
 }
