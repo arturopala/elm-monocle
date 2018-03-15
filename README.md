@@ -13,6 +13,7 @@ Published as [**arturopala/elm-monocle**](http://package.elm-lang.org/packages/a
 ```elm
 import Monocle.Optional exposing (Optional)
 import Monocle.Lens exposing (Lens)
+import Monocle.Common exposing ((<|>), (=>))
 
 
 type StreetType
@@ -48,37 +49,22 @@ type alias Place =
 
 addressOfPlace : Optional Place Address
 addressOfPlace =
-    let
-        getOption p = p.address
-
-        set a p = { p | address = Just a }
-    in
-        Optional getOption set
+    Optional .address (\b a -> { a | address = Just b })
 
 
 regionOfAddress : Optional Address String
 regionOfAddress =
-    let
-        getOption a = a.region
-
-        set r a = { a | region = Just r }
-    in
-        Optional getOption set
+    Optional .region (\b a -> { a | region = Just b })
 
 
 streetNameOfAddress : Lens Address String
 streetNameOfAddress =
-    let
-        get a = a.streetName
-
-        set sn a = { a | streetName = sn }
-    in
-        Lens get set
+    Lens .streetName (\b a -> { a | streetName = b })
 
 
 regionOfPlace : Optional Place String
 regionOfPlace =
-    Monocle.Optional.compose addressOfPlace regionOfAddress
+    addressOfPlace => regionOfAddress
 
 
 streetNameOfPlace : Optional Place String
@@ -105,7 +91,9 @@ place =
 
 updatedPlace : Place
 updatedPlace =
-    place |> regionOfPlace.set "NorthEast" |> streetNameOfPlace.set "Union Avenue"
+    place
+        |> regionOfPlace.set "NorthEast"
+        |> streetNameOfPlace.set "Union Avenue"
 ```
 
 # Abstractions
