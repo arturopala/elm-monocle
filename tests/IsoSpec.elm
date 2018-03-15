@@ -1,4 +1,4 @@
-module IsoSpec exposing (all)
+module IsoSpec exposing (..)
 
 import Test exposing (..)
 import Expect

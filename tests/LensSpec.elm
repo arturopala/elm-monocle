@@ -1,4 +1,4 @@
-module LensSpec exposing (all)
+module LensSpec exposing (..)
 
 import Test exposing (..)
 import Expect

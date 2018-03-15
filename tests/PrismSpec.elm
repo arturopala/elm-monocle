@@ -1,4 +1,4 @@
-module PrismSpec exposing (all)
+module PrismSpec exposing (..)
 
 import Test exposing (..)
 import Expect
@@ -66,7 +66,6 @@ notnumbers =
 numbersAndNotNumbers : Fuzzer String
 numbersAndNotNumbers =
     Fuzz.frequency [ ( 0.5, numbers ), ( 0.5, notnumbers ) ]
-        |> Result.withDefault string
 
 
 test_prism_property_partial_round_trip_one_way : Test

@@ -1,4 +1,4 @@
-module OptionalSpec exposing (all)
+module OptionalSpec exposing (..)
 
 import Test exposing (..)
 import Expect

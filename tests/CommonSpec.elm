@@ -1,4 +1,4 @@
-module CommonSpec exposing (all)
+module CommonSpec exposing (..)
 
 import Test exposing (..)
 import Expect
