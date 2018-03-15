@@ -169,24 +169,14 @@ A Lens is a functional concept which solves a very common problem: how to easily
 
     addressStreetNameLens : Lens Address String
     addressStreetNameLens =
-        let
-            get a = a.streetName
-
-            set sn a = { a | streetName = sn }
-        in
-            Lens get set
+        Lens .streetName (\b a -> { a | streetName = b })
 
     placeAddressLens : Lens Place Address
     placeAddressLens =
-        let
-            get p = p.address
-
-            set a p = { p | address = a }
-        in
-            Lens get set
+        Lens .address (\b a -> { a | street = b })
 
     placeStreetName: Lens Place String
-    placeStreetName = compose placeAddressLens addressStreetNameLens
+    placeStreetName = placeAddressLens <|> addressStreetNameLens
 
     myPlace = Place "my" (Address "Elm" "00001" "Daisytown")
     placeStreetName.get myPlace == "Elm"
@@ -214,18 +204,13 @@ A Optional is a weaker Lens and a weaker Prism.
 ```elm
     addressRegionOptional : Optional Address String
     addressRegionOptional =
-        let
-            getOption a = a.region
-
-            set r a = { a | region = Just r }
-        in
-            Optional getOption set
+        Optional .region (\b a -> { a | region = Just b })
 
     string2IntPrism : Prism String Int
     string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
 
     addressRegionIntOptional: Optional Address Int
-    addressRegionIntOptional = compose addressRegionOptional (fromPrism string2IntPrism)
+    addressRegionIntOptional = addressRegionOptional => (fromPrism string2IntPrism)
 
     string2CharListIso : Iso String (List Char)
     string2CharListIso = Iso String.toList String.fromList
@@ -330,11 +315,12 @@ creating record lenses.
 ## Prerequisites
 
 -   Node.js
--   Run `npm run install-with-elm`
+-   Yarn
+-   Run `yarn install-with-elm`
 
 ## Compile
 
-Run `npm run compile`
+Run `yarn compile`
 
 ## Test
 
