@@ -173,7 +173,7 @@ A Lens is a functional concept which solves a very common problem: how to easily
 
     placeAddressLens : Lens Place Address
     placeAddressLens =
-        Lens .address (\b a -> { a | street = b })
+        Lens .address (\b a -> { a | address = b })
 
     placeStreetName: Lens Place String
     placeStreetName = placeAddressLens <|> addressStreetNameLens
