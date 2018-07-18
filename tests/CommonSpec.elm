@@ -2,25 +2,52 @@ module CommonSpec exposing (..)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (list, int, tuple, string, char)
+import Fuzz exposing (int, tuple, string, char)
 import String
 import Dict
 import Maybe
 import Array
-import Monocle.Common exposing (dict, (=>), (=|>), maybe, array, id)
+import Monocle.Lens exposing (Lens)
+import Monocle.Common exposing (dict, (<|>), (=>), (=|>), maybe, array, list, listToArray, id)
 
 
 all : Test
 all =
     describe "A Common specification"
         [ test_maybe
+        , test_compose_lens
         , test_array_just
         , test_array_nothing
+        , test_list_just
+        , test_list_nothing
+        , test_list_to_array_get
+        , test_list_to_array_reverse_get
         , test_dict_empty
         , test_dict_list
         , test_infix_compose_optionals
         , test_infix_compose_optional_with_lens
         ]
+
+
+test_compose_lens : Test
+test_compose_lens =
+    let
+        fromAtoB =
+            Lens .b (\b a -> { a | b = b })
+
+        fromBtoC =
+            Lens .c (\c b -> { b | c = c })
+
+        fromCtoD =
+            Lens .d (\d c -> { c | d = d })
+
+        test d =
+            { b = { c = { d = d + 1 } } }
+                |> .set (fromAtoB <|> fromBtoC <|> fromCtoD) d
+                |> .get (fromAtoB <|> fromBtoC <|> fromCtoD)
+                |> Expect.equal d
+    in
+        fuzz int "Common.<|> should compose lenses together" test
 
 
 test_maybe : Test
@@ -48,6 +75,42 @@ test_array_nothing =
             .getOption (array 8) (Array.fromList [ i, i, i, i, i, i, i, i ]) |> Expect.equal Nothing
     in
         fuzz int "Common.array should return nothing if index out of bound" test
+
+
+test_list_just : Test
+test_list_just =
+    let
+        test i =
+            .getOption (list 2) [ 10, 11, i, 13 ] |> Expect.equal (Just i)
+    in
+        fuzz int "Common.list should get some value at position 2" test
+
+
+test_list_nothing : Test
+test_list_nothing =
+    let
+        test i =
+            .getOption (list 8) [ i, i, i, i, i, i, i, i ] |> Expect.equal Nothing
+    in
+        fuzz int "Common.list should return nothing if index out of bound" test
+
+
+test_list_to_array_get : Test
+test_list_to_array_get =
+    let
+        test l =
+            .get listToArray l |> Expect.equal (l |> Array.fromList)
+    in
+        fuzz (Fuzz.list int) "Common.listToArray.get should convert a list to an array" test
+
+
+test_list_to_array_reverse_get : Test
+test_list_to_array_reverse_get =
+    let
+        test a =
+            .reverseGet listToArray a |> Expect.equal (Array.toList a)
+    in
+        fuzz (Fuzz.array int) "Common.listToArray.reverseGet should convert an array to a list" test
 
 
 test_dict_empty : Test

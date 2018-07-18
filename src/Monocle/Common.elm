@@ -7,6 +7,8 @@ module Monocle.Common exposing (..)
 @docs (=|>)
 @docs maybe
 @docs array
+@docs list
+@docs listToArray
 @docs dict
 @docs result
 @docs id
@@ -17,6 +19,7 @@ module Monocle.Common exposing (..)
 
 import Array exposing (Array)
 import Dict exposing (Dict)
+import Monocle.Iso exposing (Iso)
 import Monocle.Lens as Lens exposing (Lens)
 import Monocle.Optional as Optional exposing (Optional)
 
@@ -56,9 +59,8 @@ Allows to chain lens composition for deeply nested structures:
 
 {-| Convenient infix operator for composing optionals.
 
-.getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
-
-> 12
+    .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
+    => 12
 
 -}
 (=>) : Optional a b -> Optional b c -> Optional a c
@@ -68,9 +70,8 @@ Allows to chain lens composition for deeply nested structures:
 
 {-| Convenient infix operator for composing optional with lens.
 
-.getOption (maybe =|> id) (Just { id = 12 })
-
-> 12
+    .getOption (maybe =|> id) (Just { id = 12 })
+    => 12
 
 -}
 (=|>) : Optional a b -> Lens b c -> Optional a c
@@ -105,6 +106,36 @@ array index =
     { getOption = Array.get index
     , set = Array.set index
     }
+
+
+{-| Step into an `List` at the given index.
+(shortcut to avoid converting a `List` to an `Array` ; if it is too slow,
+consider using `array` and an `Array` instead of a `List` in your data)
+
+    .getOption (list 2) [ 10, 11, 12, 13 ]
+    > Just 12
+
+    .getOption (list 8) [ 10, 11, 12, 13 ]
+    > Nothing
+
+-}
+list : Int -> Optional (List a) a
+list index =
+    Optional.fromLens (Lens.fromIso listToArray) => array index
+
+
+{-| Iso that converts a list to an array.
+
+    .get listToArray [1, 2, 3, 4] == Array.fromList [1, 2, 3, 4]
+    > True
+
+    .reverseGet listToArray (Array.fromList [9, 8, 7, 6]) == [ 9, 8, 7, 6 ]
+    > True
+
+-}
+listToArray : Iso (List a) (Array a)
+listToArray =
+    Iso Array.fromList Array.toList
 
 
 {-| Step into a `Dict` with the given key.
