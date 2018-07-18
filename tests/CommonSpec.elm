@@ -7,13 +7,15 @@ import String
 import Dict
 import Maybe
 import Array
-import Monocle.Common exposing (dict, (=>), (=|>), maybe, array, id)
+import Monocle.Lens exposing (Lens)
+import Monocle.Common exposing (dict, (<|>), (=>), (=|>), maybe, array, id)
 
 
 all : Test
 all =
     describe "A Common specification"
         [ test_maybe
+        , test_compose_lens
         , test_array_just
         , test_array_nothing
         , test_dict_empty
@@ -21,6 +23,27 @@ all =
         , test_infix_compose_optionals
         , test_infix_compose_optional_with_lens
         ]
+
+
+test_compose_lens : Test
+test_compose_lens =
+    let
+        fromAtoB =
+            Lens .b (\b a -> { a | b = b })
+
+        fromBtoC =
+            Lens .c (\c b -> { b | c = c })
+
+        fromCtoD =
+            Lens .d (\d c -> { c | d = d })
+
+        test d =
+            { b = { c = { d = d + 1 } } }
+                |> .set (fromAtoB <|> fromBtoC <|> fromCtoD) d
+                |> .get (fromAtoB <|> fromBtoC <|> fromCtoD)
+                |> Expect.equal d
+    in
+        fuzz int "Common.<|> should compose lenses together" test
 
 
 test_maybe : Test
