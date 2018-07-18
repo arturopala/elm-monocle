@@ -56,9 +56,8 @@ Allows to chain lens composition for deeply nested structures:
 
 {-| Convenient infix operator for composing optionals.
 
-.getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
-
-> 12
+    .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
+    => 12
 
 -}
 (=>) : Optional a b -> Optional b c -> Optional a c
@@ -68,9 +67,8 @@ Allows to chain lens composition for deeply nested structures:
 
 {-| Convenient infix operator for composing optional with lens.
 
-.getOption (maybe =|> id) (Just { id = 12 })
-
-> 12
+    .getOption (maybe =|> id) (Just { id = 12 })
+    => 12
 
 -}
 (=|>) : Optional a b -> Lens b c -> Optional a c
