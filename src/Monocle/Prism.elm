@@ -1,9 +1,16 @@
-module Monocle.Prism exposing (Prism, isMatching, modify, modifyOption, compose, composeIso, fromIso)
+module Monocle.Prism exposing
+    ( Prism
+    , isMatching, modify, modifyOption, compose, composeIso
+    , fromIso
+    )
 
 {-| A Prism is a tool which optionally converts elements of type A into elements of type B and back.
 
+
 # Definition
+
 @docs Prism
+
 
 # Example
 
@@ -15,10 +22,14 @@ module Monocle.Prism exposing (Prism, isMatching, modify, modifyOption, compose,
     string2IntPrism.getOption "1a896" == Nothing
     string2IntPrism.reverseGet 1626767 = "1626767"
 
+
 # Derived methods
+
 @docs isMatching, modify, modifyOption, compose, composeIso
 
+
 # Conversion
+
 @docs fromIso
 
 -}
@@ -39,11 +50,12 @@ type alias Prism a b =
 
         Monocle.Prism.isMatching string2IntPrism "abc" == False
         Monocle.Prism.isMatching string2IntPrism "123" == True
+
 -}
 isMatching : Prism a b -> a -> Bool
 isMatching prism a =
     case prism.getOption a of
-        Just a ->
+        Just c ->
             True
 
         Nothing ->
@@ -56,6 +68,7 @@ isMatching prism a =
         modified = Monocle.Prism.modify string2IntPrism fx
         modified "22" == Just "44"
         modified "abc" == Nothing
+
 -}
 modifyOption : Prism a b -> (b -> b) -> a -> Maybe a
 modifyOption prism f =
@@ -68,13 +81,15 @@ modifyOption prism f =
         modified = Monocle.Prism.modify string2IntPrism fx
         modified "22" == "44"
         modified "abc" == "abc"
+
 -}
 modify : Prism a b -> (b -> b) -> a -> a
 modify prism f =
     let
-        m x = modifyOption prism f x |> Maybe.withDefault x
+        m x =
+            modifyOption prism f x |> Maybe.withDefault x
     in
-        m
+    m
 
 
 {-| Composes `Prism a b` with `Prism b c` and returns `Prism a c`
@@ -90,14 +105,14 @@ compose : Prism a b -> Prism b c -> Prism a c
 compose outer inner =
     let
         getOption x =
-            case (outer.getOption x) of
+            case outer.getOption x of
                 Just y ->
                     y |> inner.getOption
 
                 Nothing ->
                     Nothing
     in
-        Prism (getOption) (inner.reverseGet >> outer.reverseGet)
+    Prism getOption (inner.reverseGet >> outer.reverseGet)
 
 
 {-| Composes `Prism a b` with `Iso b c` and returns `Prism a c`
@@ -108,19 +123,20 @@ compose outer inner =
         prism.getOption "22.2" == Nothing
         prism.getOption "22a" == Nothing
         prism.getOption "abc" == Nothing
+
 -}
 composeIso : Prism a b -> Iso b c -> Prism a c
 composeIso outer inner =
     let
         getOption x =
-            case (outer.getOption x) of
+            case outer.getOption x of
                 Just y ->
                     y |> inner.get |> Just
 
                 Nothing ->
                     Nothing
     in
-        Prism (getOption) (inner.reverseGet >> outer.reverseGet)
+    Prism getOption (inner.reverseGet >> outer.reverseGet)
 
 
 {-| Casts `Iso a b` to `Prism a b`

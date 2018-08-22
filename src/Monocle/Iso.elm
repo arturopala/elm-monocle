@@ -1,13 +1,21 @@
-module Monocle.Iso exposing (Iso, reverse, modify, compose)
+module Monocle.Iso exposing
+    ( Iso
+    , reverse, modify, compose
+    )
 
 {-| An Iso is a tool which converts elements of type A into elements of type B and back without loss.
 
+
 # Definition
+
 @docs Iso
 
+
 # Laws
+
     Identity:  \x -> iso.get(iso.reverseGet x) == x
     Reversed:  \x -> iso.reverseGet(iso.get x) == x
+
 
 # Example
 
@@ -18,8 +26,11 @@ module Monocle.Iso exposing (Iso, reverse, modify, compose)
     (string2CharListIso.get "ABcdE") == ['A','B','c','d','E']
     (string2CharListIso.reverseGet ['A','B','c','d','E']) == "ABcdE"
 
+
 # Derived methods
+
 @docs reverse, modify, compose
+
 -}
 
 
@@ -36,6 +47,7 @@ type alias Iso a b =
         .get (Iso.reversed someiso) == someiso.reverseGet
         .reverseGet (Iso.reversed someiso) == someiso.get
         Iso.compose someiso (Iso.reversed someiso) == Iso identity identity
+
 -}
 reverse : Iso a b -> Iso b a
 reverse iso =

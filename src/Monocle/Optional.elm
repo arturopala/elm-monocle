@@ -1,4 +1,8 @@
-module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, composeLens, modifyOption, modify, modify2, modify3, zip, tuple, tuple3)
+module Monocle.Optional exposing
+    ( Optional
+    , compose, composeLens, modifyOption, modify, modify2, modify3, zip, tuple, tuple3
+    , fromPrism, fromLens
+    )
 
 {-| A Optional is a weaker Lens and a weaker Prism
 
@@ -29,12 +33,17 @@ module Monocle.Optional exposing (Optional, fromPrism, fromLens, compose, compos
             set r a =
                 { a | region = Just r }
         in
-            Optional getOption set
+        Optional getOption set
 
 -}
 
-import Monocle.Prism exposing (Prism)
 import Monocle.Lens exposing (Lens)
+import Monocle.Prism exposing (Prism)
+
+
+flip : (a -> b -> c) -> b -> a -> c
+flip f b a =
+    f a b
 
 
 {-| In order to create Optional we need to supply 2 functions: set and getOption
@@ -65,14 +74,14 @@ compose outer inner =
                 |> Maybe.withDefault a
 
         getOption a =
-            case (outer.getOption a) of
+            case outer.getOption a of
                 Just x ->
                     x |> inner.getOption
 
                 Nothing ->
                     Nothing
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| Composes `Optional a b` with `Lens b c` and returns `Optional a c`
@@ -95,14 +104,14 @@ composeLens opt lens =
                 |> Maybe.withDefault a
 
         getOption a =
-            case (opt.getOption a) of
+            case opt.getOption a of
                 Just b ->
                     b |> lens.get |> Just
 
                 Nothing ->
                     Nothing
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| Modifies given function `(b -> b)` to be `(a -> Maybe a)` using `Optional a b`
@@ -120,7 +129,7 @@ modifyOption opt fx =
         mf a =
             opt.getOption a |> Maybe.map (fx >> flip opt.set a)
     in
-        mf
+    mf
 
 
 {-| Modifies given function `(b -> b)` to be `(a -> a)` using `Optional a b`
@@ -138,7 +147,7 @@ modify opt fx =
         mf a =
             modifyOption opt fx a |> Maybe.withDefault a
     in
-        mf
+    mf
 
 
 {-| Modifies given function `(b,d) -> (b,d)` to be `(a,c) -> (a,c)` using `Optional a b` and `Optional c d`
@@ -157,7 +166,7 @@ modify2 opt1 opt2 fx =
                 _ ->
                     ( a, c )
     in
-        mf
+    mf
 
 
 {-| Modifies given function `( b, d, f ) -> ( b, d, f )` to be `( a, c, e ) -> ( a, c, e )` using `Optional a b` and `Optional c d` and `Optional e f`
@@ -176,7 +185,7 @@ modify3 opt1 opt2 opt3 fx =
                 _ ->
                     ( a, c, e )
     in
-        mf
+    mf
 
 
 {-| Casts `Prism a b` to `Optional a b`
@@ -196,7 +205,7 @@ fromPrism prism =
         set b _ =
             prism.reverseGet b
     in
-        Optional prism.getOption set
+    Optional prism.getOption set
 
 
 {-| Casts `Lens a b` to `Optional a b` where `getOption` will return always `Just`
@@ -207,7 +216,7 @@ fromLens lens =
         getOption a =
             Just (lens.get a)
     in
-        Optional getOption lens.set
+    Optional getOption lens.set
 
 
 {-| Zip `Optional a c` with `Optional b d` to form Optional for the pairs ( a, b ) ( c, d )
@@ -226,7 +235,7 @@ zip left right =
         set ( c, d ) ( a, b ) =
             ( left.set c a, right.set d b )
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| Tuple `Optional a b` with `Optional a c` and returns `Optional a (b,c)`
@@ -248,7 +257,7 @@ tuple left right =
         set ( b, c ) a =
             right.set c (left.set b a)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| Tuple `Optional a b` with `Optional a c` with `Optional a d` and returns `Optional a (b,c,d)`
@@ -270,4 +279,4 @@ tuple3 first second third =
         set ( b, c, d ) a =
             first.set b a |> second.set c |> third.set d
     in
-        Optional getOption set
+    Optional getOption set

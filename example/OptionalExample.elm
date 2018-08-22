@@ -1,7 +1,7 @@
-module OptionalExample exposing (..)
+module OptionalExample exposing (Address, Country(..), Place, StreetType(..), addressOfPlace, place, regionOfAddress, regionOfPlace, streetNameOfAddress, streetNameOfPlace, updatedPlace)
 
-import Monocle.Optional exposing (Optional)
 import Monocle.Lens exposing (Lens)
+import Monocle.Optional exposing (Optional)
 
 
 type StreetType
@@ -38,31 +38,37 @@ type alias Place =
 addressOfPlace : Optional Place Address
 addressOfPlace =
     let
-        getOption p = p.address
+        getOption p =
+            p.address
 
-        set a p = { p | address = Just a }
+        set a p =
+            { p | address = Just a }
     in
-        Optional getOption set
+    Optional getOption set
 
 
 regionOfAddress : Optional Address String
 regionOfAddress =
     let
-        getOption a = a.region
+        getOption a =
+            a.region
 
-        set r a = { a | region = Just r }
+        set r a =
+            { a | region = Just r }
     in
-        Optional getOption set
+    Optional getOption set
 
 
 streetNameOfAddress : Lens Address String
 streetNameOfAddress =
     let
-        get a = a.streetName
+        get a =
+            a.streetName
 
-        set sn a = { a | streetName = sn }
+        set sn a =
+            { a | streetName = sn }
     in
-        Lens get set
+    Lens get set
 
 
 regionOfPlace : Optional Place String

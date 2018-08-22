@@ -1,4 +1,14 @@
-module Monocle.Common exposing (..)
+module Monocle.Common exposing
+    ( maybe
+    , array
+    , list
+    , listToArray
+    , dict
+    , result
+    , id
+    , first
+    , second
+    )
 
 {-| Common lenses/prisms/optionals that most projects will use.
 
@@ -24,65 +34,10 @@ import Monocle.Lens as Lens exposing (Lens)
 import Monocle.Optional as Optional exposing (Optional)
 
 
-{-| Convenient Infix operator for composing lenses.
-Allows to chain lens composition for deeply nested structures:
-
-    fromAtoB : Lens A B
-    fromAtoB = Lense .b (\a b -> { a | b = b })
-
-    fromBtoC : Lens B C
-    fromBtoC = Lense .c (\b c -> { b | c = c })
-
-    fromCtoD : Lens C D
-    fromCtoD = Lense .d (\c d -> { c | d = d })
-
-    fromDtoE : Lens D E
-    fromDtoE = Lense .e (\d e -> { d | e = e })
-
-    fromAtoE : Lens A E
-    fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
-
-    a : A
-    a = { b: { c: { d: { e: "Whatever we want to get" } } } }
-
-    fromAtoE.get a
-    => "Whatever we want to get"
-
-    fromAtoE.set a "What we want to set"
-    => { b: { c: { d: { e: "What we want to set" } } } }
-
--}
-(<|>) : Lens a b -> Lens b c -> Lens a c
-(<|>) =
-    Lens.compose
-
-
-{-| Convenient infix operator for composing optionals.
-
-    .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
-    => 12
-
--}
-(=>) : Optional a b -> Optional b c -> Optional a c
-(=>) =
-    Optional.compose
-
-
-{-| Convenient infix operator for composing optional with lens.
-
-    .getOption (maybe =|> id) (Just { id = 12 })
-    => 12
-
--}
-(=|>) : Optional a b -> Lens b c -> Optional a c
-(=|>) a b =
-    Optional.compose a (Optional.fromLens b)
-
-
 {-| Step into a `Maybe` value.
 
     maybe.set 5 Nothing
-    > Just 5
+        > Just 5
 
 -}
 maybe : Optional (Maybe a) a
@@ -95,10 +50,10 @@ maybe =
 {-| Step into an `Array` at the given index.
 
     .getOption (array 2) (Array.fromList [ 10, 11, 12, 13 ])
-    > Just 12
+        > Just 12
 
     .getOption (array 8) (Array.fromList [ 10, 11, 12, 13 ])
-    > Nothing
+        > Nothing
 
 -}
 array : Int -> Optional (Array a) a
@@ -113,24 +68,26 @@ array index =
 consider using `array` and an `Array` instead of a `List` in your data)
 
     .getOption (list 2) [ 10, 11, 12, 13 ]
-    > Just 12
+        > Just 12
 
     .getOption (list 8) [ 10, 11, 12, 13 ]
-    > Nothing
+        > Nothing
 
 -}
 list : Int -> Optional (List a) a
 list index =
-    Optional.fromLens (Lens.fromIso listToArray) => array index
+    Optional.compose (Optional.fromLens (Lens.fromIso listToArray)) (array index)
 
 
 {-| Iso that converts a list to an array.
 
-    .get listToArray [1, 2, 3, 4] == Array.fromList [1, 2, 3, 4]
-    > True
+    .get listToArray [ 1, 2, 3, 4 ]
+        == Array.fromList [ 1, 2, 3, 4 ]
+        > True
 
-    .reverseGet listToArray (Array.fromList [9, 8, 7, 6]) == [ 9, 8, 7, 6 ]
-    > True
+    .reverseGet listToArray (Array.fromList [ 9, 8, 7, 6 ])
+        == [ 9, 8, 7, 6 ]
+        > True
 
 -}
 listToArray : Iso (List a) (Array a)
@@ -141,10 +98,10 @@ listToArray =
 {-| Step into a `Dict` with the given key.
 
     .getOption (dict "Tom") (Dict.fromList [ ( "Tom", "Cat" ) ])
-    > Just "Cat"
+        > Just "Cat"
 
     .getOption (dict "Jerry") (Dict.fromList [ ( "Tom", "Cat" ) ])
-    > Nothing
+        > Nothing
 
 -}
 dict : comparable -> Optional (Dict comparable v) v
@@ -157,10 +114,10 @@ dict key =
 {-| Step into the success value of a `Result`.
 
     result.getOption (Ok 5)
-    > Just 5
+        > Just 5
 
     result.getOption (Err "500")
-    > Nothing
+        > Nothing
 
 -}
 result : Optional (Result e a) a
@@ -183,14 +140,14 @@ creating record lenses.
 id : Lens { a | id : b } b
 id =
     { get = .id
-    , set = \id record -> { record | id = id }
+    , set = \a record -> { record | id = a }
     }
 
 
 {-| Step into the first element of a pair.
 
     first.get ( 'a', 'b' )
-    > Just 'a'
+        > Just 'a'
 
 -}
 first : Lens ( a, b ) a
@@ -203,7 +160,7 @@ first =
 {-| Step into the second element of a pair.
 
     second.get ( 'a', 'b' )
-    > Just 'b'
+        > Just 'b'
 
 -}
 second : Lens ( a, b ) b
