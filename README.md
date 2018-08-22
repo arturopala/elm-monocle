@@ -13,7 +13,6 @@ Published as [**arturopala/elm-monocle**](http://package.elm-lang.org/packages/a
 ```elm
 import Monocle.Optional exposing (Optional)
 import Monocle.Lens exposing (Lens)
-import Monocle.Common exposing ((<|>), (=>))
 
 
 type StreetType
@@ -234,39 +233,6 @@ A Optional is a weaker Lens and a weaker Prism.
 ## Common
 Common lenses/prisms/optionals that most projects will use.
 
-#### Convenient infix operator for composing lenses.
-Allows to chain lens composition for deeply nested structures:
-```elm
-    fromAtoB : Lens A B
-    fromAtoB = Lens .b (\b a -> { a | b = b })
-    fromBtoC : Lens B C
-    fromBtoC = Lens .c (\c b -> { b | c = c })
-    fromCtoD : Lens C D
-    fromCtoD = Lens .d (\d c -> { c | d = d })
-    fromDtoE : Lens D E
-    fromDtoE = Lens .e (\e d -> { d | e = e })
-    fromAtoE : Lens A E
-    fromAtoE = fromAtoB <|> fromBtoC <|> fromCtoD <|> fromDtoE
-
-    a : A
-    a = { b: { c: { d: { e: "Whatever we want to get" } } } }
-
-    fromAtoE.get a
-    => "Whatever we want to get"
-
-    fromAtoE.set a "What we want to set"
-    => { b: { c: { d: { e: "What we want to set" } } } }
-```
-#### Convenient infix operator for composing optionals.
-```elm
-    .getOption (maybe => array 2) (Just <| Array.fromList [ 10, 11, 12, 13 ])
-    > 12
-```
-#### Convenient infix operator for composing optional with lens.
-```elm
-    .getOption (maybe =|> id) (Just { id = 12 })
-    > 12
-```
 ####  Step into a `Maybe` value.
 ```elm  
     maybe.set 5 Nothing
