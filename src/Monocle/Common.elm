@@ -12,9 +12,6 @@ module Monocle.Common exposing
 
 {-| Common lenses/prisms/optionals that most projects will use.
 
-@docs (<|>)
-@docs (=>)
-@docs (=|>)
 @docs maybe
 @docs array
 @docs list
