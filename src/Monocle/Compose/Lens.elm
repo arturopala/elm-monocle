@@ -1,10 +1,12 @@
 module Monocle.Compose.Lens
     exposing
-        ( withLens
+        ( withIso
+        , withLens
         , withOptional
+        , withPrism
         )
 
-{-| Pipeline-friendly composition helpers for Lenses
+{-| Pipeline-friendly composition helpers from Lenses
 
 Using these allow to compose an "outer" lense with an "inner" other optic.
 
@@ -35,8 +37,10 @@ This is arguably more "discoverable" and maybe more readable, if more verbose.
 
 -}
 
+import Monocle.Iso exposing (Iso)
 import Monocle.Lens as Lens exposing (Lens(..))
-import Monocle.Optional as Optional exposing (Optional(..))
+import Monocle.Optional exposing (Optional(..))
+import Monocle.Prism exposing (Prism)
 
 
 {-| pipeline-friendly composition between two Lenses
@@ -53,8 +57,8 @@ import Monocle.Optional as Optional exposing (Optional(..))
     ad : Lens A D
     ad =
       ab
-        |> Lens.withLens bc
-        |> Lens.withLens cd
+        |> ComposeLens.withLens bc
+        |> ComposeLens.withLens cd
 
 -}
 withLens : Lens b c -> Lens a b -> Lens a c
@@ -74,7 +78,7 @@ withLens inner outer =
     ad : Optional A D
     ad =
       ab
-        |> Lens.withOptional bc
+        |> ComposeLens.withOptional bc
 
 -}
 withOptional : Optional b c -> Lens a b -> Optional a c
@@ -101,7 +105,7 @@ withOptional inner outer =
     ad : Optional A D
     ad =
       ab
-        |> Lens.withPrism bc
+        |> ComposeLens.withPrism bc
 
 -}
 withPrism : Prism b c -> Lens a b -> Optional a c
@@ -128,7 +132,7 @@ withPrism inner outer =
     ad : Lens A D
     ad =
       ab
-        |> Lens.withIso bc
+        |> ComposeLens.withIso bc
 
 -}
 withIso : Iso b c -> Lens a b -> Lens a c
