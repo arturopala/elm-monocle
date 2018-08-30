@@ -38,8 +38,8 @@ This is arguably more "discoverable" and maybe more readable, if more verbose.
 -}
 
 import Monocle.Iso exposing (Iso)
-import Monocle.Lens as Lens exposing (Lens(..))
-import Monocle.Optional exposing (Optional(..))
+import Monocle.Lens as Lens exposing (Lens)
+import Monocle.Optional exposing (Optional)
 import Monocle.Prism exposing (Prism)
 
 
@@ -88,7 +88,7 @@ withOptional inner outer =
             outer.get >> inner.getOption
 
         set c =
-            modify outer (inner.set c)
+            Lens.modify outer (inner.set c)
     in
         Optional getOption set
 
@@ -144,4 +144,4 @@ withIso inner outer =
         set c =
             outer.set (inner.reverseGet c)
     in
-        Lens getOption set
+        Lens get set

@@ -15,8 +15,8 @@ Using these allow to compose an "outer" optional with an "inner" other optic.
 -}
 
 import Monocle.Iso exposing (Iso)
-import Monocle.Lens exposing (Lens(..))
-import Monocle.Optional as Optional exposing (Optional(..))
+import Monocle.Lens exposing (Lens)
+import Monocle.Optional as Optional exposing (Optional)
 import Monocle.Prism exposing (Prism)
 
 
@@ -115,10 +115,10 @@ withPrism inner outer =
 withIso : Iso b c -> Optional a b -> Optional a c
 withIso inner outer =
     let
-        get =
+        getOption =
             outer.getOption >> Maybe.map inner.get
 
         set c =
-            Optional.modify outer (inner.reverseGet c)
+            outer.set (inner.reverseGet c)
     in
         Optional getOption set
