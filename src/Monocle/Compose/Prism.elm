@@ -1,9 +1,9 @@
 module Monocle.Compose.Prism
     exposing
         ( withIso
-          -- , withLens
-          -- , withOptional
-          -- , withPrism
+        , withLens
+        , withOptional
+        , withPrism
         )
 
 {-| Pipeline-friendly composition helpers from Prisms
@@ -64,8 +64,8 @@ withIso inner outer =
         getOption =
             outer.getOption >> Maybe.map inner.get
 
-        set c =
-            Prism.modify outer (inner.reverseGet c)
+        reverseGet =
+            inner.reverseGet >> outer.reverseGet
     in
         Prism getOption reverseGet
 
@@ -85,7 +85,7 @@ withIso inner outer =
         |> ComposePrism.withLens bc
 
 -}
-withLens : Lens b c -> Prism a b -> Prism a c
+withLens : Lens b c -> Prism a b -> Optional a c
 withLens inner outer =
     let
         getOption =
@@ -112,8 +112,8 @@ withLens inner outer =
         |> ComposePrism.withOptional bc
 
 -}
-withLens : Lens b c -> Prism a b -> Prism a c
-withLens inner outer =
+withOptional : Optional b c -> Prism a b -> Optional a c
+withOptional inner outer =
     let
         getOption =
             outer.getOption >> Maybe.andThen inner.getOption
