@@ -281,7 +281,7 @@ test_lens_method_tuple3 =
         lens =
             tuple3 addressStreetNameLens addressPostcodeLens addressTownLens
 
-        test ( address, street, postcode, town ) =
+        test ( address, ( street, postcode, town ) ) =
             lens.get (lens.set ( street, postcode, town ) address) |> Expect.equal ( street, postcode, town )
     in
-        fuzz (Fuzz.tuple4 ( addresses, string, string, string )) "Lens tuple3 method" test
+        fuzz (Fuzz.tuple ( addresses, Fuzz.tuple3 ( string, string, string ) )) "Lens tuple3 method" test

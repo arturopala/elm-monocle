@@ -26,12 +26,12 @@ all =
 
 string2IntPrism : Prism String Int
 string2IntPrism =
-    Prism (String.toInt >> Result.toMaybe) toString
+    Prism String.toInt String.fromInt
 
 
 string2FloatPrism : Prism String Float
 string2FloatPrism =
-    Prism (String.toFloat >> Result.toMaybe) toString
+    Prism String.toFloat String.fromFloat
 
 
 float2IntPrism : Prism Float Int
@@ -55,7 +55,7 @@ float2IntPrism =
 
 numbers : Fuzzer String
 numbers =
-    Fuzz.map toString int
+    Fuzz.map String.fromInt int
 
 
 notnumbers : Fuzzer String
@@ -130,7 +130,7 @@ test_prism_method_modify =
                 modified s
 
         expected s =
-            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString) |> Maybe.withDefault s
+            s |> String.toInt >> Maybe.map ((*) 2 >> String.fromInt) |> Maybe.withDefault s
 
         test s =
             Expect.equal (computed s) (expected s)
@@ -155,7 +155,7 @@ test_prism_method_modify_option =
                 modified s
 
         expected s =
-            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 2 >> toString)
+            s |> String.toInt >> Maybe.map ((*) 2 >> String.fromInt)
 
         test s =
             Expect.equal (computed s) (expected s)
@@ -176,7 +176,7 @@ test_prism_method_compose =
             prism.getOption s
 
         expected s =
-            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
+            s |> String.toInt >> Maybe.map ((*) 10)
 
         test s =
             Expect.equal (computed s) (expected s)
@@ -197,7 +197,7 @@ test_prism_method_composeIso =
             prism.getOption s
 
         expected s =
-            s |> String.toInt >> Result.toMaybe >> Maybe.map ((*) 10)
+            s |> String.toInt >> Maybe.map ((*) 10)
 
         test s =
             Expect.equal (computed s) (expected s)
