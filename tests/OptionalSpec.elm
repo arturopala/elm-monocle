@@ -99,7 +99,7 @@ placeAddressOptional =
 
 string2IntPrism : Prism String Int
 string2IntPrism =
-    Prism (String.toInt >> Result.toMaybe) toString
+    Prism String.toInt String.fromInt
 
 
 string2CharListIso : Iso String (List Char)
@@ -132,7 +132,7 @@ places =
 
 numbers : Fuzzer String
 numbers =
-    Fuzz.map toString int
+    Fuzz.map String.fromInt int
 
 
 test_optional_property_identity_when_just =
@@ -174,7 +174,7 @@ test_optional_method_fromPrism_getOption =
             fromPrism string2IntPrism
 
         expected s =
-            Just (String.toInt s |> Result.toMaybe |> Maybe.withDefault 0)
+            Just (String.toInt s |> Maybe.withDefault 0)
 
         test s =
             opt.getOption s |> Expect.equal (expected s)
@@ -188,7 +188,7 @@ test_optional_method_fromPrism_set =
             fromPrism string2IntPrism
 
         test i =
-            opt.set i "" |> Expect.equal (toString i)
+            opt.set i "" |> Expect.equal (String.fromInt i)
     in
         fuzz int "Optional.fromPrism.set" test
 
@@ -202,7 +202,7 @@ test_optional_method_compose =
             opt.set i a
 
         expected ( a, i ) =
-            { a | region = Just (toString i) }
+            { a | region = Just (String.fromInt i) }
     in
         fuzz (Fuzz.tuple ( addressesWithRegion, int )) "Optional.compose" (\s -> Expect.equal (computed s) (expected s))
 
