@@ -156,15 +156,16 @@ A Lens is a functional concept which solves a very common problem: how to easily
 ###### Example
 
 ```elm
-
     type alias Address = 
-        {streetName: String
-        ,postcode: String
-        ,town: String}
+        { streetName: String
+        , postcode: String
+        , town: String
+        }
 
     type alias Place =
-        {name: String
-        ,address: Address}
+        { name: String
+        , address: Address
+        }
 
     addressStreetNameLens : Lens Address String
     addressStreetNameLens =
