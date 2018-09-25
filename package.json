@@ -4,7 +4,7 @@
   "description": "Library providing purely functional abstractions to manipulate records",
   "scripts": {
     "compile": "elm make ./src/**/*.elm --output monocle.js",
-    "install-with-elm": "yarn install && elm package install -y",
+    "install-with-elm": "yarn install && elm make",
     "test": "elm-test",
     "test-and-watch": "elm-test --watch",
     "bump": "elm bump",
