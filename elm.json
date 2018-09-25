@@ -3,7 +3,7 @@
     "name": "arturopala/elm-monocle",
     "summary": "Library providing functional tools to manipulate complex records",
     "license": "MIT",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "exposed-modules": [
         "Monocle.Iso",
         "Monocle.Prism",
@@ -17,6 +17,6 @@
         "elm/core": "1.0.0 <= v < 2.0.0"
     },
     "test-dependencies": {
-      "elm-explorations/test": "1.1.0 <= v < 1.1.1"
+        "elm-explorations/test": "1.1.0 <= v < 1.1.1"
     }
 }
