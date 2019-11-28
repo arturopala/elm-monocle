@@ -63,7 +63,7 @@ streetNameOfAddress =
 
 regionOfPlace : Optional Place String
 regionOfPlace =
-    addressOfPlace => regionOfAddress
+    addressOfPlace |> Monocle.Compose.optionalWithOptional regionOfAddress
 
 
 streetNameOfPlace : Optional Place String
@@ -211,7 +211,8 @@ A Optional is a weaker Lens and a weaker Prism.
     string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
 
     addressRegionIntOptional: Optional Address Int
-    addressRegionIntOptional = addressRegionOptional => (fromPrism string2IntPrism)
+    addressRegionIntOptional =
+        addressRegionOptional |> Monocle.Compose.optionalWithPrism string2IntPrism
 
     string2CharListIso : Iso String (List Char)
     string2CharListIso = Iso String.toList String.fromList
