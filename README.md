@@ -234,11 +234,51 @@ A Optional is a weaker Lens and a weaker Prism.
     modifyAddressRegion address = Optional.modify addressRegionOptional modifyRegion address
 ```
 
+## Traversal
+
+A Traversal allows you to modify many elements at once.
+
+```elm
+    type alias Traversal a b =
+        (b -> b) -> a -> a
+```
+
+(`Traversal a b` is just an alias for a function that applies
+a transformation over `b` elements of a larger `a` structure.)
+
+###### Example
+
+```elm
+    firstNameLens : Lens Friend String
+    firstNameLens =
+        Lens .firstName (\b a -> { a | firstName = b })
+
+    bestFriendsTraversal : Traversal (List Friend) Friend
+    bestFriendsTraversal =
+        Traversal.some
+            Traversal.list
+            (\friend -> friend.value == Best)
+
+    friendsLens : Lens Account (List Friend)
+    friendsLens =
+        Lens .friends (\b a -> { a | friends = b })
+
+    firstNamesOfBestFriends : Traversal Account String
+    firstNamesOfBestFriends =
+        friendsLens
+            |> Compose.lensWithTraversal bestFriendsTraversal
+            |> Compose.traversalWithLens firstNameLens
+
+    upcaseBestFriendsFirstNames : Account -> Account
+    upcaseBestFriendsFirstNames account =
+        Traversal.modify firstNamesOfBestFriends String.toUpper
+```
+
 ## Common
 Common lenses/prisms/optionals that most projects will use.
 
 ####  Step into a `Maybe` value.
-```elm  
+```elm
     maybe.set 5 Nothing
     > Just 5
 ```

@@ -3,12 +3,13 @@
     "name": "arturopala/elm-monocle",
     "summary": "Library providing functional tools to manipulate complex records",
     "license": "MIT",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "exposed-modules": [
         "Monocle.Iso",
         "Monocle.Prism",
         "Monocle.Lens",
         "Monocle.Optional",
+        "Monocle.Traversal",
         "Monocle.Common",
         "Monocle.Compose"
     ],
