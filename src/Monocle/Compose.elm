@@ -1,22 +1,10 @@
-module Monocle.Compose
-    exposing
-        ( isoWithIso
-        , isoWithLens
-        , isoWithOptional
-        , isoWithPrism
-        , lensWithIso
-        , lensWithLens
-        , lensWithOptional
-        , lensWithPrism
-        , prismWithIso
-        , prismWithLens
-        , prismWithOptional
-        , prismWithPrism
-        , optionalWithIso
-        , optionalWithLens
-        , optionalWithOptional
-        , optionalWithPrism
-        )
+module Monocle.Compose exposing
+    ( isoWithIso, isoWithPrism, isoWithLens, isoWithOptional, isoWithTraversal
+    , prismWithIso, prismWithPrism, prismWithLens, prismWithOptional, prismWithTraversal
+    , lensWithIso, lensWithPrism, lensWithLens, lensWithOptional, lensWithTraversal
+    , optionalWithIso, optionalWithPrism, optionalWithLens, optionalWithOptional, optionalWithTraversal
+    , traversalWithIso, traversalWithPrism, traversalWithLens, traversalWithOptional, traversalWithTraversal
+    )
 
 {-| Pipeline-friendly composition helpers
 
@@ -27,6 +15,7 @@ expressed as functions that compose through the composition operator (just like
 any other functions) ; in Elm (plus typclasses), it would look like this:
 
     lensAtoB >> lensBtoC >> lensCtoD == lensAtoD
+
     lensAtoB >> optionalBtoC >> prismCtoD == optionalAtoC
 
 But Elm doesn't support typeclasses, so we're stuck with defining composition
@@ -47,22 +36,27 @@ This is arguably more "discoverable" and maybe more readable, if more verbose.
 
 # From an Iso
 
-@docs isoWithIso, isoWithPrism, isoWithLens, isoWithOptional
+@docs isoWithIso, isoWithPrism, isoWithLens, isoWithOptional, isoWithTraversal
 
 
 # From a Prism
 
-@docs prismWithIso, prismWithPrism, prismWithLens, prismWithOptional
+@docs prismWithIso, prismWithPrism, prismWithLens, prismWithOptional, prismWithTraversal
 
 
 # From a Lens
 
-@docs lensWithIso, lensWithPrism, lensWithLens, lensWithOptional
+@docs lensWithIso, lensWithPrism, lensWithLens, lensWithOptional, lensWithTraversal
 
 
 # From an Optional
 
-@docs optionalWithIso, optionalWithPrism, optionalWithLens, optionalWithOptional
+@docs optionalWithIso, optionalWithPrism, optionalWithLens, optionalWithOptional, optionalWithTraversal
+
+
+# From a Traversal
+
+@docs traversalWithIso, traversalWithPrism, traversalWithLens, traversalWithOptional, traversalWithTraversal
 
 -}
 
@@ -70,6 +64,7 @@ import Monocle.Iso as Iso exposing (Iso)
 import Monocle.Lens as Lens exposing (Lens)
 import Monocle.Optional as Optional exposing (Optional)
 import Monocle.Prism as Prism exposing (Prism)
+import Monocle.Traversal as Traversal exposing (Traversal)
 
 
 {-| pipeline-friendly composition between two Iso
@@ -115,7 +110,27 @@ isoWithPrism inner outer =
         reverseGet =
             inner.reverseGet >> outer.reverseGet
     in
-        Prism getOption reverseGet
+    Prism getOption reverseGet
+
+
+{-| pipeline-friendly composition between an outer Iso and an inner Traversal
+(the result is a Traversal)
+
+    ab : Iso A B
+    ab = ..
+
+    bc : Traversal B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeIso.isoWithTraversal bc
+
+-}
+isoWithTraversal : Traversal b c -> Iso a b -> Traversal a c
+isoWithTraversal inner outer transformation =
+    Iso.modify outer (Traversal.modify inner transformation)
 
 
 {-| pipeline-friendly composition between an outer Iso and an inner Lens
@@ -142,7 +157,7 @@ isoWithLens inner outer =
         set c =
             Iso.modify outer (inner.set c)
     in
-        Lens get set
+    Lens get set
 
 
 {-| pipeline-friendly composition between an outer Iso and an inner Optional
@@ -169,7 +184,7 @@ isoWithOptional inner outer =
         set c =
             Iso.modify outer (inner.set c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between an outer Prism and an inner Iso
@@ -196,7 +211,7 @@ prismWithIso inner outer =
         reverseGet =
             inner.reverseGet >> outer.reverseGet
     in
-        Prism getOption reverseGet
+    Prism getOption reverseGet
 
 
 {-| pipeline-friendly composition between two Prisms
@@ -242,7 +257,7 @@ prismWithLens inner outer =
         set c =
             Prism.modify outer (inner.set c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between an outer Prism and an inner Optional
@@ -269,7 +284,27 @@ prismWithOptional inner outer =
         set c =
             Prism.modify outer (inner.set c)
     in
-        Optional getOption set
+    Optional getOption set
+
+
+{-| pipeline-friendly composition between an outer Prism and an inner Traversal
+(the result is a Traversal)
+
+    ab : Prism A B
+    ab = ..
+
+    bc : Traversal B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposePrism.prismWithTraversal bc
+
+-}
+prismWithTraversal : Traversal b c -> Prism a b -> Traversal a c
+prismWithTraversal inner outer transformation =
+    Prism.modify outer (Traversal.modify inner transformation)
 
 
 {-| pipeline-friendly composition between an outer Lens and an inner Iso
@@ -296,7 +331,7 @@ lensWithIso inner outer =
         set c =
             outer.set (inner.reverseGet c)
     in
-        Lens get set
+    Lens get set
 
 
 {-| pipeline-friendly composition between an outer Lens and an inner Prism
@@ -323,7 +358,7 @@ lensWithPrism inner outer =
         set c =
             outer.set (inner.reverseGet c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between two Lenses
@@ -369,7 +404,27 @@ lensWithOptional inner outer =
         set c =
             Lens.modify outer (inner.set c)
     in
-        Optional getOption set
+    Optional getOption set
+
+
+{-| pipeline-friendly composition between an outer Lens and an inner Traversal
+(the result is an Traversal)
+
+    ab : Lens A B
+    ab = ..
+
+    bc : Traversal B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> Compose.lensWithTraversal bc
+
+-}
+lensWithTraversal : Traversal b c -> Lens a b -> Traversal a c
+lensWithTraversal inner outer transformation =
+    Lens.modify outer (Traversal.modify inner transformation)
 
 
 {-| pipeline-friendly composition between an outer Optional and an inner Iso
@@ -396,7 +451,7 @@ optionalWithIso inner outer =
         set c =
             outer.set (inner.reverseGet c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between an outer Optional and an inner Prism
@@ -423,7 +478,7 @@ optionalWithPrism inner outer =
         set c =
             outer.set (inner.reverseGet c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between an outer Optional and an inner Lens
@@ -450,7 +505,7 @@ optionalWithLens inner outer =
         set c =
             Optional.modify outer (inner.set c)
     in
-        Optional getOption set
+    Optional getOption set
 
 
 {-| pipeline-friendly composition between two Optionals
@@ -470,3 +525,123 @@ optionalWithLens inner outer =
 optionalWithOptional : Optional b c -> Optional a b -> Optional a c
 optionalWithOptional inner outer =
     Optional.compose outer inner
+
+
+{-| pipeline-friendly composition between an outer Optional and an inner Traversal
+(the result is a Optional)
+
+    ab : Optional A B
+    ab = ..
+
+    bc : Traversal B C
+    bc = ..
+
+    ac : Optional A C
+    ac =
+      ab
+        |> ComposeOptional.optionalWithTraversal bc
+
+-}
+optionalWithTraversal : Traversal b c -> Optional a b -> Traversal a c
+optionalWithTraversal inner outer transformation =
+    Optional.modify outer (Traversal.modify inner transformation)
+
+
+{-| pipeline-friendly composition between an outer Traversal and an inner Iso
+(the result is a Traversal)
+
+    ab : Traversal A B
+    ab = ..
+
+    bc : Iso B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeTraversal.traversalWithIso bc
+
+-}
+traversalWithIso : Iso b c -> Traversal a b -> Traversal a c
+traversalWithIso inner outer transformation =
+    Traversal.modify outer (Iso.modify inner transformation)
+
+
+{-| pipeline-friendly composition between an outer Traversal and an inner Lens
+(the result is a Traversal)
+
+    ab : Traversal A B
+    ab = ..
+
+    bc : Lens B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeTraversal.traversalWithLens bc
+
+-}
+traversalWithLens : Lens b c -> Traversal a b -> Traversal a c
+traversalWithLens inner outer transformation =
+    Traversal.modify outer (Lens.modify inner transformation)
+
+
+{-| pipeline-friendly composition between an outer Traversal and an inner Optional
+(the result is a Traversal)
+
+    ab : Traversal A B
+    ab = ..
+
+    bc : Optional B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeTraversal.traversalWithOptional bc
+
+-}
+traversalWithOptional : Optional b c -> Traversal a b -> Traversal a c
+traversalWithOptional inner outer transformation =
+    Traversal.modify outer (Optional.modify inner transformation)
+
+
+{-| pipeline-friendly composition between an outer Traversal and an inner Prism
+(the result is a Traversal)
+
+    ab : Traversal A B
+    ab = ..
+
+    bc : Prism B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeTraversal.traversalWithPrism bc
+
+-}
+traversalWithPrism : Prism b c -> Traversal a b -> Traversal a c
+traversalWithPrism inner outer transformation =
+    Traversal.modify outer (Prism.modify inner transformation)
+
+
+{-| pipeline-friendly composition between two Traversals
+(the result is a Traversal)
+
+    ab : Traversal A B
+    ab = ..
+
+    bc : Traversal B C
+    bc = ..
+
+    ac : Traversal A C
+    ac =
+      ab
+        |> ComposeTraversal.traversalWithTraversal bc
+
+-}
+traversalWithTraversal : Traversal b c -> Traversal a b -> Traversal a c
+traversalWithTraversal inner outer transformation =
+    Traversal.modify outer (Traversal.modify inner transformation)
