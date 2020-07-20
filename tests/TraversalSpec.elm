@@ -2,9 +2,8 @@ module TraversalSpec exposing (all)
 
 import Array
 import Expect
-import Fuzz exposing (Fuzzer, array, int, list)
-import Monocle.Traversal as Traversal exposing (Traversal)
-import String
+import Fuzz exposing (array, int, list)
+import Monocle.Traversal as Traversal
 import Test exposing (..)
 
 
@@ -14,6 +13,7 @@ all =
         "A Traversal specification"
         [ test_list_traversal
         , test_array_traversal
+        , test_some_traversal
         ]
 
 
@@ -50,4 +50,4 @@ test_some_traversal =
                 |> Traversal.modify odds ((+) 3)
                 |> Expect.equal [ 4, 2, 6, 4, 8 ]
     in
-    Test.test "Traversal modify on an array" test
+    Test.test "Traversal modify some elements in an array" test
