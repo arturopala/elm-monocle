@@ -16,7 +16,7 @@ module Monocle.Prism exposing
 
     string2IntPrism : Prism String Int
     string2IntPrism =
-        Prism (String.toInt >> Result.toMaybe) toString
+        Prism String.toInt String.fromInt
 
     string2IntPrism.getOption "17896" == Just 17896
     string2IntPrism.getOption "1a896" == Nothing
