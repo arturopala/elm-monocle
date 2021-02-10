@@ -58,7 +58,7 @@ type alias Optional a b =
 
     string2IntPrism : Prism String Int
     string2IntPrism =
-        Prism (String.toInt >> Result.toMaybe) toString
+        Prism String.toInt String.fromInt
 
     addressRegionIntOptional : Optional Address Int
     addressRegionIntOptional =
@@ -192,7 +192,7 @@ modify3 opt1 opt2 opt3 fx =
 
     string2IntPrism : Prism String Int
     string2IntPrism =
-        Prism (String.toInt >> Result.toMaybe) toString
+        Prism String.toInt String.fromInt
 
     stringIntOptional : Optional String Int
     stringIntOptional =
