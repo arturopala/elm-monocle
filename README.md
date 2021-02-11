@@ -312,17 +312,17 @@ included for convenience. It also serves as a simple recipe for
 creating record lenses.
 ```elm   
     id.get { id = 1000, name = ... }
-    > Just 1000
+    > 1000
 ```
 ####  Step into the first element of a pair.
 ```elm
     first.get ( 'a', 'b' )
-    > Just 'a'
+    > 'a'
 ```
 ####  Step into the second element of a pair.
 ```elm    
     second.get ( 'a', 'b' )
-    > Just 'b'
+    > 'b'
 ```
 
 # Build
