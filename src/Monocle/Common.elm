@@ -127,7 +127,7 @@ result =
 {-| Step into a record with an `id` key.
 
     id.get { id = 1000, name = ... }
-    > Just 1000
+    > 1000
 
 Since records with an `id` field are incredible common, this is
 included for convenience. It also serves as a simple recipe for
@@ -144,7 +144,7 @@ id =
 {-| Step into the first element of a pair.
 
     first.get ( 'a', 'b' )
-        > Just 'a'
+        > 'a'
 
 -}
 first : Lens ( a, b ) a
@@ -157,7 +157,7 @@ first =
 {-| Step into the second element of a pair.
 
     second.get ( 'a', 'b' )
-        > Just 'b'
+        > 'b'
 
 -}
 second : Lens ( a, b ) b
