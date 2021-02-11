@@ -135,7 +135,7 @@ A Prism is a tool which optionally converts elements of type A into elements of 
 ```elm
     string2IntPrism : Prism String Int
     string2IntPrism =
-        Prism (String.toInt >> Result.toMaybe) toString
+        Prism String.toInt String.fromInt
 
     string2IntPrism.getOption "17896" == Just 17896
     string2IntPrism.getOption "1a896" == Nothing
@@ -208,7 +208,7 @@ A Optional is a weaker Lens and a weaker Prism.
         Optional .region (\b a -> { a | region = Just b })
 
     string2IntPrism : Prism String Int
-    string2IntPrism = Prism (String.toInt >> Result.toMaybe) toString
+    string2IntPrism = Prism String.toInt String.fromInt
 
     addressRegionIntOptional: Optional Address Int
     addressRegionIntOptional =
