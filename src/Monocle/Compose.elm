@@ -12,7 +12,7 @@ Using these allow to compose an "outer" optic with an "inner" other optic.
 
 Optics in functional programming languages that support typeclasses can be
 expressed as functions that compose through the composition operator (just like
-any other functions) ; in Elm (plus typclasses), it would look like this:
+any other functions) ; in Elm (plus typeclasses), it would look like this:
 
     lensAtoB >> lensBtoC >> lensCtoD == lensAtoD
 
