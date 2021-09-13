@@ -80,7 +80,7 @@ compose outer inner =
 {-| Modifies given function `(b -> b)` to be `(a -> a)` using `Lens a b`
 
     addressStreetNameLens = Lens Address String
-    fx streetName = String.reverse streeName
+    fx streetName = String.reverse streetName
     fx2 = Lens.modify addressStreetNameLens fx
     fx2 {streetName="abcdef"} == {streetName="fedcba"}
 
