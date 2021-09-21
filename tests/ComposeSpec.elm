@@ -240,12 +240,12 @@ test_lensWithLens =
         lensPerson2StreetAddress =
             Lens .streetAddress (\streetAddress person -> { person | streetAddress = streetAddress })
 
-        lensStreetAdress2City =
+        lensStreetAddress2City =
             Lens .city (\city streetAddress -> { streetAddress | city = city })
 
         lensPerson2StreetAddressCity =
             lensPerson2StreetAddress
-                |> Compose.lensWithLens lensStreetAdress2City
+                |> Compose.lensWithLens lensStreetAddress2City
 
         personify ( name, street, city ) =
             { name = name
